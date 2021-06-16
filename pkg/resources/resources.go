@@ -29,11 +29,12 @@ func ToBootstrapFile(config *config.Config, path string) (*applyinator.File, err
 		nodeName = strings.Split(hostname, ".")[0]
 	}
 
-	var (
-		k8sVersion = versions.K8sVersion(config)
-		token      = config.Token
-		err        error
-	)
+	k8sVersion, err := versions.K8sVersion(config)
+	if err != nil {
+		return nil, err
+	}
+
+	token := config.Token
 	if token == "" {
 		token, err = randomtoken.Generate()
 		if err != nil {

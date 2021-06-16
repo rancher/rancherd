@@ -12,6 +12,7 @@ func NewRetry() *cobra.Command {
 	return cli.Command(&Retry{}, cobra.Command{
 		Short:              "Retry command until it succeeds",
 		DisableFlagParsing: true,
+		Hidden:             true,
 	})
 }
 

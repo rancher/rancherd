@@ -10,16 +10,16 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type App struct {
+type Rancherd struct {
 }
 
-func (a *App) Run(cmd *cobra.Command, args []string) error {
+func (a *Rancherd) Run(cmd *cobra.Command, args []string) error {
 	return cmd.Help()
 }
 
 func main() {
-	root := cli.Command(&App{}, cobra.Command{
-		Long: "Bootstrappin' the whole Ranch",
+	root := cli.Command(&Rancherd{}, cobra.Command{
+		Long: "Bootstrap Rancher and k3s/rke2 on a node",
 	})
 	root.AddCommand(
 		bootstrap.NewBootstrap(),

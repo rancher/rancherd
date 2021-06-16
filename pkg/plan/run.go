@@ -18,7 +18,10 @@ import (
 )
 
 func Run(ctx context.Context, cfg *config.Config, plan *applyinator.Plan, dataDir string) error {
-	k8sVersion := versions.K8sVersion(cfg)
+	k8sVersion, err := versions.K8sVersion(cfg)
+	if err != nil {
+		return err
+	}
 	runtime := config.GetRuntime(k8sVersion)
 
 	if err := writePlan(plan, dataDir); err != nil {

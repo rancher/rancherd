@@ -42,7 +42,10 @@ func toJoinPlan(cfg *config.Config, dataDir string) (*applyinator.Plan, error) {
 	}
 
 	plan := plan{}
-	k8sVersion := versions.K8sVersion(cfg)
+	k8sVersion, err := versions.K8sVersion(cfg)
+	if err != nil {
+		return nil, err
+	}
 
 	if err := plan.addFile(runtime.ToFile(&cfg.RuntimeConfig, config.GetRuntime(k8sVersion), false)); err != nil {
 		return nil, err
@@ -67,7 +70,11 @@ func ToPlan(config *config.Config, dataDir string) (*applyinator.Plan, error) {
 }
 
 func (p *plan) addInstructions(cfg *config.Config, dataDir string) error {
-	k8sVersion := versions.K8sVersion(cfg)
+	k8sVersion, err := versions.K8sVersion(cfg)
+	if err != nil {
+		return err
+	}
+
 	if err := p.addInstruction(runtime.ToInstruction(cfg.RuntimeInstallerImage, cfg.SystemDefaultRegistry, k8sVersion)); err != nil {
 		return err
 	}
@@ -76,7 +83,10 @@ func (p *plan) addInstructions(cfg *config.Config, dataDir string) error {
 		return err
 	}
 
-	rancherVersion := versions.RancherVersion(cfg)
+	rancherVersion, err := versions.RancherVersion(cfg)
+	if err != nil {
+		return err
+	}
 	if err := p.addInstruction(rancher.ToInstruction(cfg.RancherInstallerImage, cfg.SystemDefaultRegistry, k8sVersion, rancherVersion, dataDir)); err != nil {
 		return err
 	}
@@ -102,7 +112,10 @@ func (p *plan) addInstruction(instruction *applyinator.Instruction, err error) e
 }
 
 func (p *plan) addFiles(cfg *config.Config, dataDir string) error {
-	k8sVersions := versions.K8sVersion(cfg)
+	k8sVersions, err := versions.K8sVersion(cfg)
+	if err != nil {
+		return err
+	}
 	runtimeName := config.GetRuntime(k8sVersions)
 
 	// config.yaml
@@ -143,13 +156,19 @@ func (p *plan) addFile(file *applyinator.File, err error) error {
 }
 
 func (p *plan) addProbesForRoles(cfg *config.Config) error {
-	k8sVersion := versions.K8sVersion(cfg)
+	k8sVersion, err := versions.K8sVersion(cfg)
+	if err != nil {
+		return err
+	}
 	p.Probes = probe.ProbesForRole(&cfg.RuntimeConfig, config.GetRuntime(k8sVersion))
 	return nil
 }
 
 func (p *plan) addProbes(cfg *config.Config) error {
-	k8sVersion := versions.K8sVersion(cfg)
+	k8sVersion, err := versions.K8sVersion(cfg)
+	if err != nil {
+		return err
+	}
 	p.Probes = probe.AllProbes(config.GetRuntime(k8sVersion))
 	return nil
 }
