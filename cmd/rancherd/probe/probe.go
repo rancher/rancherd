@@ -11,7 +11,8 @@ import (
 
 func NewProbe() *cobra.Command {
 	return cli.Command(&Probe{}, cobra.Command{
-		Short: "Run plan probes",
+		Short:  "Run plan probes",
+		Hidden: true,
 	})
 }
 

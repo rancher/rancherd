@@ -9,6 +9,7 @@ import (
 
 	"github.com/rancher/rancherd/pkg/config"
 	"github.com/rancher/rancherd/pkg/plan"
+	"github.com/rancher/rancherd/pkg/versions"
 	"github.com/sirupsen/logrus"
 	"sigs.k8s.io/yaml"
 )
@@ -43,6 +44,18 @@ func (r *Rancherd) execute(ctx context.Context) error {
 		logrus.Infof("No role defined, skipping bootstrap")
 		return nil
 	}
+
+	k8sVersion, err := versions.K8sVersion(&cfg)
+	if err != nil {
+		return err
+	}
+
+	rancherVersion, err := versions.RancherVersion(&cfg)
+	if err != nil {
+		return err
+	}
+
+	logrus.Infof("Bootstrapping Rancher (%s/%s)", rancherVersion, k8sVersion)
 
 	nodePlan, err := plan.ToPlan(&cfg, r.cfg.DataDir)
 	if err != nil {
@@ -105,6 +118,7 @@ func (r *Rancherd) setDone(cfg config.Config) error {
 
 func (r *Rancherd) done() (bool, error) {
 	if r.cfg.Force {
+		_ = os.Remove(r.DoneStamp())
 		return false, nil
 	}
 	_, err := os.Stat(r.DoneStamp())
