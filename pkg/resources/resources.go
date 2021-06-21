@@ -1,8 +1,11 @@
 package resources
 
 import (
+	"crypto/sha256"
 	"encoding/base64"
+	"encoding/hex"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"strings"
 
@@ -18,6 +21,38 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 )
+
+func writeCattleID(id string) error {
+	if err := os.MkdirAll("/etc/rancher", 0755); err != nil {
+		return fmt.Errorf("mkdir /etc/rancher: %w", err)
+	}
+	if err := os.MkdirAll("/etc/rancher/agent", 0700); err != nil {
+		return fmt.Errorf("mkdir /etc/rancher/agent: %w", err)
+	}
+	return ioutil.WriteFile("/etc/rancher/agent/cattle-id", []byte(id), 0400)
+}
+
+func getCattleID() (string, error) {
+	data, err := ioutil.ReadFile("/etc/rancher/agent/cattle-id")
+	if os.IsNotExist(err) {
+	} else if err != nil {
+		return "", err
+	}
+	id := strings.TrimSpace(string(data))
+	if id == "" {
+		id, err = randomtoken.Generate()
+		if err != nil {
+			return "", err
+		}
+		return id, writeCattleID(id)
+	}
+	return id, nil
+}
+
+func machineRequestSecretName(name string) string {
+	hash := sha256.Sum256([]byte(name))
+	return "custom-" + hex.EncodeToString(hash[:])[:12]
+}
 
 func ToBootstrapFile(config *config.Config, path string) (*applyinator.File, error) {
 	nodeName := config.NodeName
@@ -40,6 +75,11 @@ func ToBootstrapFile(config *config.Config, path string) (*applyinator.File, err
 		if err != nil {
 			return nil, err
 		}
+	}
+
+	id, err := getCattleID()
+	if err != nil {
+		return nil, err
 	}
 
 	return ToFile(append(config.BootstrapResources, v1.GenericMap{
@@ -68,6 +108,9 @@ func ToBootstrapFile(config *config.Config, path string) (*applyinator.File, err
 			"metadata": map[string]interface{}{
 				"name":      "local",
 				"namespace": "fleet-local",
+				"labels": map[string]interface{}{
+					"rke.cattle.io/init-node-machine-id": id,
+				},
 			},
 			"spec": map[string]interface{}{
 				"kubernetesVersion": k8sVersion,

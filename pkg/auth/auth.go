@@ -340,7 +340,7 @@ func getServerURL(ctx context.Context, nodeClient corev1interface.NodeInterface,
 func setClusterAnnotation(ctx context.Context, clustersClient dynamic.NamespaceableResourceInterface, adminName string) error {
 	cluster, err := clustersClient.Get(ctx, "local", v1.GetOptions{})
 	if err != nil {
-		return errors.Errorf("Local cluster is not ready yet")
+		return fmt.Errorf("Local cluster is not ready yet (get local cluster: %w)", err)
 	}
 	if adminName == "" {
 		return errors.Errorf("User is not set yet")
