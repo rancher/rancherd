@@ -114,7 +114,9 @@ func ToBootstrapFile(config *config.Config, path string) (*applyinator.File, err
 			},
 			"spec": map[string]interface{}{
 				"kubernetesVersion": k8sVersion,
-				"rkeConfig":         map[string]interface{}{},
+				"rkeConfig": map[string]interface{}{
+					"controlPlaneConfig": config.ConfigValues,
+				},
 			},
 		},
 	}, v1.GenericMap{
