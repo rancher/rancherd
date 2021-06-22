@@ -17,7 +17,7 @@ var defaultValues = map[string]interface{}{
 		"enabled": false,
 	},
 	"features":       "multi-cluster-management=false",
-	"replicas":       -1,
+	"replicas":       -2,
 	"tls":            "external",
 	"hostPort":       8443,
 	"noDefaultAdmin": true,
