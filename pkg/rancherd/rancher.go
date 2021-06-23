@@ -57,7 +57,7 @@ func (r *Rancherd) execute(ctx context.Context) error {
 
 	logrus.Infof("Bootstrapping Rancher (%s/%s)", rancherVersion, k8sVersion)
 
-	nodePlan, err := plan.ToPlan(&cfg, r.cfg.DataDir)
+	nodePlan, err := plan.ToPlan(ctx, &cfg, r.cfg.DataDir)
 	if err != nil {
 		return fmt.Errorf("generating plan: %w", err)
 	}

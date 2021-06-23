@@ -1,9 +1,11 @@
 package plan
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/rancher/rancherd/pkg/config"
+	"github.com/rancher/rancherd/pkg/discovery"
 	"github.com/rancher/rancherd/pkg/join"
 	"github.com/rancher/rancherd/pkg/probe"
 	"github.com/rancher/rancherd/pkg/rancher"
@@ -62,11 +64,15 @@ func toJoinPlan(cfg *config.Config, dataDir string) (*applyinator.Plan, error) {
 	return (*applyinator.Plan)(&plan), nil
 }
 
-func ToPlan(config *config.Config, dataDir string) (*applyinator.Plan, error) {
-	if config.Role == "cluster-init" {
-		return toInitPlan(config, dataDir)
+func ToPlan(ctx context.Context, config *config.Config, dataDir string) (*applyinator.Plan, error) {
+	newCfg := *config
+	if err := discovery.DiscoverServerAndRole(ctx, &newCfg); err != nil {
+		return nil, err
 	}
-	return toJoinPlan(config, dataDir)
+	if newCfg.Role == "cluster-init" {
+		return toInitPlan(&newCfg, dataDir)
+	}
+	return toJoinPlan(&newCfg, dataDir)
 }
 
 func (p *plan) addInstructions(cfg *config.Config, dataDir string) error {

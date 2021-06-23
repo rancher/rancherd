@@ -38,10 +38,11 @@ var (
 
 type Config struct {
 	RuntimeConfig
-	KubernetesVersion string `json:"kubernetesVersion,omitempty"`
-	RancherVersion    string `json:"rancherVersion,omitempty"`
-	Server            string `json:"server,omitempty"`
-	Role              string `json:"role,omitempty"`
+	KubernetesVersion string            `json:"kubernetesVersion,omitempty"`
+	RancherVersion    string            `json:"rancherVersion,omitempty"`
+	Server            string            `json:"server,omitempty"`
+	Discovery         map[string]string `json:"discovery,omitempty"`
+	Role              string            `json:"role,omitempty"`
 
 	RancherValues      map[string]interface{} `json:"rancherValues,omitempty"`
 	PreInstructions    []plan.Instruction     `json:"preInstructions,omitempty"`

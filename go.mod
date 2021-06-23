@@ -31,7 +31,9 @@ replace (
 )
 
 require (
+	github.com/hashicorp/go-discover v0.0.0-20201029210230-738cb3105cd0 // indirect
 	github.com/pkg/errors v0.9.1
+	github.com/rancher/dynamiclistener v0.3.1-0.20210616080009-9865ae859c7f // indirect
 	github.com/rancher/rancher/pkg/apis v0.0.0-20210616082234-54d4afc27c36
 	github.com/rancher/system-agent v0.0.1-alpha30
 	github.com/rancher/wharfie v0.3.2
