@@ -68,7 +68,7 @@ func discoverServerAndRole(ctx context.Context, cfg *config.Config) (string, boo
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	server, err := NewJoinServer(ctx, port)
+	server, err := newJoinServer(ctx, port)
 	if err != nil {
 		return "", false, err
 	}
@@ -109,7 +109,6 @@ func (j *joinServer) loop(ctx context.Context, params map[string]string, port in
 		req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 		if err != nil {
 			logrus.Errorf("failed to construct request for %s: %v", url, err)
-			allAgree = false
 			return "", false
 		}
 		resp, err := insecureHTTPClient.Do(req)
@@ -166,7 +165,7 @@ type pingResponse struct {
 	Peers []string `json:"peers,omitempty"`
 }
 
-func NewJoinServer(ctx context.Context, port int64) (*joinServer, error) {
+func newJoinServer(ctx context.Context, port int64) (*joinServer, error) {
 	id, err := randomtoken.Generate()
 	if err != nil {
 		return nil, err

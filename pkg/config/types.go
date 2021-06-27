@@ -18,9 +18,10 @@ import (
 
 var (
 	defaultPaths = []string{
-		"/usr/share/rancher/rancherd/config.yaml",
+		"/system/oem/userdata",
 		"/usr/share/oem/rancher/rancherd/config.yaml",
 		"/oem/userdata",
+		"/usr/share/rancher/rancherd/config.yaml",
 	}
 
 	manifests = []string{

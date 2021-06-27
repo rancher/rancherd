@@ -19,4 +19,4 @@ LimitNPROC=infinity
 LimitCORE=infinity
 TasksMax=infinity
 TimeoutStartSec=0
-ExecStart=/usr/bin/rancherd bootstrap
+ExecStart=/usr/local/bin/rancherd bootstrap
