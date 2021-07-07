@@ -25,7 +25,7 @@ func Command(k8sVersion string) string {
 	kubectl := "/usr/local/bin/kubectl"
 	runtime := config.GetRuntime(k8sVersion)
 	if runtime == config.RuntimeRKE2 {
-		kubectl = "/var/lib/rancher/rke2/bin"
+		kubectl = "/var/lib/rancher/rke2/bin/kubectl"
 	}
 	return kubectl
 }
