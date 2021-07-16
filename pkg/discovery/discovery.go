@@ -278,7 +278,7 @@ func (j *joinServer) setPeers(peers []string) []string {
 	now := time.Now()
 	for k, v := range j.peerSeen {
 		if v.Add(j.cacheDuration).Before(now) {
-			logrus.Info("Forgetting peer %s", k)
+			logrus.Infof("Forgetting peer %s", k)
 			delete(j.peerSeen, k)
 		}
 	}
@@ -286,7 +286,7 @@ func (j *joinServer) setPeers(peers []string) []string {
 	// add
 	for _, peer := range peers {
 		if _, ok := j.peerSeen[peer]; !ok {
-			logrus.Info("New peer discovered %s", peer)
+			logrus.Infof("New peer discovered %s", peer)
 		}
 		j.peerSeen[peer] = now
 	}
