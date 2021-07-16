@@ -182,8 +182,6 @@ func GetManifests(runtime config.Runtime) string {
 
 func ToInstruction(imageOverride, systemDefaultRegistry, k8sVersion, dataDir string) (*applyinator.Instruction, error) {
 	bootstrap := GetBootstrapManifests(dataDir)
-	kubectlCmd := kubectl.Command(k8sVersion)
-
 	cmd, err := self.Self()
 	if err != nil {
 		return nil, fmt.Errorf("resolving location of %s: %w", os.Args[0], err)
@@ -192,8 +190,8 @@ func ToInstruction(imageOverride, systemDefaultRegistry, k8sVersion, dataDir str
 		Name:       "bootstrap",
 		SaveOutput: true,
 		Image:      images.GetInstallerImage(imageOverride, systemDefaultRegistry, k8sVersion),
-		Args:       []string{"retry", kubectlCmd, "apply", "--validate=false", "-f", bootstrap},
-		Env:        kubectl.Env(k8sVersion),
+		Args:       []string{"retry", kubectl.Command(k8sVersion), "apply", "--validate=false", "-f", bootstrap},
 		Command:    cmd,
+		Env:        kubectl.Env(k8sVersion),
 	}, nil
 }

@@ -23,11 +23,12 @@ var (
 )
 
 func ToBootstrapFile(runtime config.Runtime) (*applyinator.File, error) {
-	bootstrapConfig := map[string]interface{}{}
-	if runtime == config.RuntimeK3S {
-		bootstrapConfig["cluster-init"] = "true"
+	if runtime != config.RuntimeK3S {
+		return nil, nil
 	}
-	data, err := json.Marshal(bootstrapConfig)
+	data, err := json.Marshal(map[string]interface{}{
+		"cluster-init": "true",
+	})
 	if err != nil {
 		return nil, err
 	}
