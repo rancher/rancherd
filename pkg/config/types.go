@@ -39,11 +39,11 @@ var (
 
 type Config struct {
 	RuntimeConfig
-	KubernetesVersion string            `json:"kubernetesVersion,omitempty"`
-	RancherVersion    string            `json:"rancherVersion,omitempty"`
-	Server            string            `json:"server,omitempty"`
-	Discovery         map[string]string `json:"discovery,omitempty"`
-	Role              string            `json:"role,omitempty"`
+	KubernetesVersion string           `json:"kubernetesVersion,omitempty"`
+	RancherVersion    string           `json:"rancherVersion,omitempty"`
+	Server            string           `json:"server,omitempty"`
+	Discovery         *DiscoveryConfig `json:"discovery,omitempty"`
+	Role              string           `json:"role,omitempty"`
 
 	RancherValues      map[string]interface{} `json:"rancherValues,omitempty"`
 	PreInstructions    []plan.Instruction     `json:"preInstructions,omitempty"`
@@ -55,6 +55,14 @@ type Config struct {
 	RancherInstallerImage string               `json:"rancherInstallerImage,omitempty"`
 	SystemDefaultRegistry string               `json:"systemDefaultRegistry,omitempty"`
 	Registries            *registries.Registry `json:"registries,omitempty"`
+}
+
+type DiscoveryConfig struct {
+	Params          map[string]string `json:"params,omitempty"`
+	ExpectedServers int               `json:"expectedServers,omitempty"`
+	// ServerCacheDuration will remember discovered servers for this amount of time.  This
+	// helps with some discovery protocols like mDNS that can be unreliable
+	ServerCacheDuration string `json:"serverCacheDuration,omitempty"`
 }
 
 func Load(path string) (result Config, err error) {
