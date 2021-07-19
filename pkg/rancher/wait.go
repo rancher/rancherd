@@ -31,7 +31,7 @@ func ToWaitRancherWebhookInstruction(imageOverride, systemDefaultRegistry, k8sVe
 		return nil, fmt.Errorf("resolving location of %s: %w", os.Args[0], err)
 	}
 	return &applyinator.Instruction{
-		Name:       "wait-rancher",
+		Name:       "wait-rancher-webhook",
 		SaveOutput: true,
 		Image:      images.GetInstallerImage(imageOverride, systemDefaultRegistry, k8sVersion),
 		Args:       []string{"retry", kubectl.Command(k8sVersion), "-n", "cattle-system", "rollout", "status", "-w", "deploy/rancher-webhook"},
