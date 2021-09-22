@@ -31,21 +31,21 @@ replace (
 )
 
 require (
-	github.com/hashicorp/go-discover v0.0.0-20201029210230-738cb3105cd0 // indirect
+	github.com/hashicorp/go-discover v0.0.0-20201029210230-738cb3105cd0
 	github.com/pkg/errors v0.9.1
-	github.com/rancher/dynamiclistener v0.3.1-0.20210616080009-9865ae859c7f // indirect
-	github.com/rancher/rancher/pkg/apis v0.0.0-20210616082234-54d4afc27c36
+	github.com/rancher/fleet/pkg/apis v0.0.0-20210920165712-667022c1d661
+	github.com/rancher/rancher/pkg/apis v0.0.0-20210920193801-79027c456224
 	github.com/rancher/system-agent v0.0.1-alpha30
 	github.com/rancher/wharfie v0.3.2
-	github.com/rancher/wrangler v0.8.1-0.20210616052237-57e55381d3ed
+	github.com/rancher/wrangler v0.8.6-0.20210819203859-0babd42fbad8
 	github.com/rancher/wrangler-cli v0.0.0-20210217230406-95cfa275f52f
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.1.3
-	golang.org/x/crypto v0.0.0-20210513164829-c07d793c2f9a
+	golang.org/x/crypto v0.0.0-20210711020723-a769d52b0f97
 	gopkg.in/yaml.v2 v2.4.0
 	gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776
-	k8s.io/api v0.21.0
-	k8s.io/apimachinery v0.21.0
+	k8s.io/api v0.21.3
+	k8s.io/apimachinery v0.21.3
 	k8s.io/client-go v12.0.0+incompatible
 	sigs.k8s.io/yaml v1.2.0
 )
