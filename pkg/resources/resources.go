@@ -1,9 +1,7 @@
 package resources
 
 import (
-	"crypto/sha256"
 	"encoding/base64"
-	"encoding/hex"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -12,7 +10,7 @@ import (
 	v1 "github.com/rancher/rancher/pkg/apis/rke.cattle.io/v1"
 	"github.com/rancher/rancherd/pkg/config"
 	"github.com/rancher/rancherd/pkg/images"
-	kubectl "github.com/rancher/rancherd/pkg/kubectl"
+	"github.com/rancher/rancherd/pkg/kubectl"
 	"github.com/rancher/rancherd/pkg/self"
 	"github.com/rancher/rancherd/pkg/versions"
 	"github.com/rancher/system-agent/pkg/applyinator"
@@ -49,11 +47,6 @@ func getCattleID() (string, error) {
 	return id, nil
 }
 
-func machineRequestSecretName(name string) string {
-	hash := sha256.Sum256([]byte(name))
-	return "custom-" + hex.EncodeToString(hash[:])[:12]
-}
-
 func ToBootstrapFile(config *config.Config, path string) (*applyinator.File, error) {
 	nodeName := config.NodeName
 	if nodeName == "" {
@@ -82,7 +75,21 @@ func ToBootstrapFile(config *config.Config, path string) (*applyinator.File, err
 		return nil, err
 	}
 
-	return ToFile(append(config.BootstrapResources, v1.GenericMap{
+	resources := config.Resources
+	if config.Git != nil {
+		resources = append(resources, v1.GenericMap{
+			Data: map[string]interface{}{
+				"kind":       "GitRepo",
+				"apiVersion": "fleet.cattle.io/v1alpha1",
+				"metadata": map[string]interface{}{
+					"name":      "rancherd-bootstrap",
+					"namespace": "fleet-local",
+				},
+				"spec": config.Git,
+			},
+		})
+	}
+	return ToFile(append(resources, v1.GenericMap{
 		Data: map[string]interface{}{
 			"kind":       "Node",
 			"apiVersion": "v1",
@@ -174,10 +181,6 @@ func ToFile(resources []v1.GenericMap, path string) (*applyinator.File, error) {
 
 func GetBootstrapManifests(dataDir string) string {
 	return fmt.Sprintf("%s/bootstrapmanifests/rancherd.yaml", dataDir)
-}
-
-func GetManifests(runtime config.Runtime) string {
-	return fmt.Sprintf("/var/lib/rancher/%s/server/manifests/rancherd.yaml", runtime)
 }
 
 func ToInstruction(imageOverride, systemDefaultRegistry, k8sVersion, dataDir string) (*applyinator.Instruction, error) {
