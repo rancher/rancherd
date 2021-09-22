@@ -19,6 +19,10 @@ import (
 type plan applyinator.Plan
 
 func toInitPlan(config *config.Config, dataDir string) (*applyinator.Plan, error) {
+	if err := assignTokenIfUnset(config); err != nil {
+		return nil, err
+	}
+
 	plan := plan{}
 	if err := plan.addFiles(config, dataDir); err != nil {
 		return nil, err
