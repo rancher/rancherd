@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/rancher/fleet/pkg/apis/fleet.cattle.io/v1alpha1"
 	v1 "github.com/rancher/rancher/pkg/apis/rke.cattle.io/v1"
 	"github.com/rancher/rancher/pkg/apis/rke.cattle.io/v1/plan"
 	"github.com/rancher/wharfie/pkg/registries"
@@ -17,23 +18,25 @@ import (
 )
 
 var (
-	defaultPaths = []string{
-		"/system/oem/userdata",
+	implicitPaths = []string{
 		"/usr/share/oem/rancher/rancherd/config.yaml",
-		"/oem/userdata",
 		"/usr/share/rancher/rancherd/config.yaml",
+		// RancherOS userdata
+		"/oem/userdata",
+		// RancherOS installation yip config
+		"/oem/99_custom.yaml",
+		// RancherOS oem location
+		"/oem/rancher/rancherd/config.yaml",
+		// Standard cloud-config
+		"/var/lib/cloud/instance/data/user-data.txt",
 	}
 
 	manifests = []string{
-		"/usr/share/rancher/rancherd/manifests",
 		"/usr/share/oem/rancher/rancherd/manifests",
+		"/usr/share/rancher/rancherd/manifests",
 		"/etc/rancher/rancherd/manifests",
-	}
-
-	bootstrapManifests = []string{
-		"/usr/share/rancher/rancherd/bootstrapmanifests",
-		"/usr/share/oem/rancher/rancherd/bootstrapmanifests",
-		"/etc/rancher/rancherd/bootstrapmanifests",
+		// RancherOS OEM
+		"/oem/rancher/rancherd/manifests",
 	}
 )
 
@@ -45,16 +48,18 @@ type Config struct {
 	Discovery         *DiscoveryConfig `json:"discovery,omitempty"`
 	Role              string           `json:"role,omitempty"`
 
-	RancherValues      map[string]interface{} `json:"rancherValues,omitempty"`
-	PreInstructions    []plan.Instruction     `json:"preInstructions,omitempty"`
-	PostInstructions   []plan.Instruction     `json:"postInstructions,omitempty"`
-	Resources          []v1.GenericMap        `json:"resources,omitempty"`
-	BootstrapResources []v1.GenericMap        `json:"bootstrapResources,omitempty"`
+	RancherValues    map[string]interface{} `json:"rancherValues,omitempty"`
+	PreInstructions  []plan.Instruction     `json:"preInstructions,omitempty"`
+	PostInstructions []plan.Instruction     `json:"postInstructions,omitempty"`
+	// Deprecated, use Resources instead
+	BootstrapResources []v1.GenericMap `json:"bootstrapResources,omitempty"`
+	Resources          []v1.GenericMap `json:"resources,omitempty"`
 
-	RuntimeInstallerImage string               `json:"runtimeInstallerImage,omitempty"`
-	RancherInstallerImage string               `json:"rancherInstallerImage,omitempty"`
-	SystemDefaultRegistry string               `json:"systemDefaultRegistry,omitempty"`
-	Registries            *registries.Registry `json:"registries,omitempty"`
+	RuntimeInstallerImage string                `json:"runtimeInstallerImage,omitempty"`
+	RancherInstallerImage string                `json:"rancherInstallerImage,omitempty"`
+	SystemDefaultRegistry string                `json:"systemDefaultRegistry,omitempty"`
+	Registries            *registries.Registry  `json:"registries,omitempty"`
+	Git                   *v1alpha1.GitRepoSpec `json:"git,omitempty"`
 }
 
 type DiscoveryConfig struct {
@@ -63,6 +68,24 @@ type DiscoveryConfig struct {
 	// ServerCacheDuration will remember discovered servers for this amount of time.  This
 	// helps with some discovery protocols like mDNS that can be unreliable
 	ServerCacheDuration string `json:"serverCacheDuration,omitempty"`
+}
+
+func paths() (result []string) {
+	for _, file := range implicitPaths {
+		result = append(result, file)
+
+		files, err := ioutil.ReadDir(file)
+		if err != nil {
+			continue
+		}
+
+		for _, entry := range files {
+			if isYAML(entry.Name()) {
+				result = append(result, filepath.Join(file, entry.Name()))
+			}
+		}
+	}
+	return
 }
 
 func Load(path string) (result Config, err error) {
@@ -74,7 +97,7 @@ func Load(path string) (result Config, err error) {
 		return result, err
 	}
 
-	for _, file := range defaultPaths {
+	for _, file := range paths() {
 		newValues, err := mergeFile(values, file)
 		if err == nil {
 			values = newValues
@@ -95,17 +118,12 @@ func Load(path string) (result Config, err error) {
 }
 
 func populatedSystemResources(config *Config) error {
-	resources, err := loadResources(bootstrapManifests...)
+	resources, err := loadResources(manifests...)
 	if err != nil {
 		return err
 	}
+	config.Resources = append(config.Resources, config.BootstrapResources...)
 	config.Resources = append(config.Resources, resources...)
-
-	resources, err = loadResources(manifests...)
-	if err != nil {
-		return err
-	}
-	config.BootstrapResources = append(config.BootstrapResources, resources...)
 
 	return nil
 }
@@ -173,6 +191,7 @@ func mergeFile(result map[string]interface{}, file string) (map[string]interface
 
 	values := map[string]interface{}{}
 	if len(bytes) > 0 {
+		logrus.Infof("Loading config file [%s]", file)
 		if err := yaml.Unmarshal(bytes, &values); err != nil {
 			return nil, err
 		}

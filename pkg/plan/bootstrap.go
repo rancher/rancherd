@@ -49,10 +49,10 @@ func toJoinPlan(cfg *config.Config, dataDir string) (*applyinator.Plan, error) {
 		return nil, err
 	}
 
-	if err := plan.addFile(runtime.ToFile(&cfg.RuntimeConfig, config.GetRuntime(k8sVersion), false)); err != nil {
+	if err := plan.addFile(join.ToScriptFile(cfg, dataDir)); err != nil {
 		return nil, err
 	}
-	if err := plan.addFile(join.ToScriptFile(cfg, dataDir)); err != nil {
+	if err := plan.addFile(runtime.ToFile(&cfg.RuntimeConfig, config.GetRuntime(k8sVersion), false)); err != nil {
 		return nil, err
 	}
 	if err := plan.addInstruction(join.ToInstruction(cfg, dataDir)); err != nil {
@@ -136,11 +136,6 @@ func (p *plan) addFiles(cfg *config.Config, dataDir string) error {
 
 	// registries.yaml
 	if err := p.addFile(registry.ToFile(cfg.Registries, runtimeName)); err != nil {
-		return err
-	}
-
-	// manifests
-	if err := p.addFile(resources.ToFile(cfg.Resources, resources.GetManifests(runtimeName))); err != nil {
 		return err
 	}
 
