@@ -8,6 +8,7 @@ import (
 	"sync"
 
 	"github.com/rancher/rancherd/pkg/config"
+	"github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
 )
 
@@ -52,7 +53,7 @@ func K8sVersion(config *config.Config) (string, error) {
 		return cached, nil
 	}
 
-	versionOrURL, isURL := getVersionOrURL("https://update.k3s.io/v1-release/channels/%s", "testing", config.KubernetesVersion)
+	versionOrURL, isURL := getVersionOrURL("https://update.k3s.io/v1-release/channels/%s", "stable", config.KubernetesVersion)
 	if !isURL {
 		return versionOrURL, nil
 	}
@@ -68,9 +69,10 @@ func K8sVersion(config *config.Config) (string, error) {
 		return "", fmt.Errorf("getting channel version URL from (%s): %w", versionOrURL, err)
 	}
 
-	versionOrURL = path.Base(url.Path)
-	cachedK8sVersion[config.KubernetesVersion] = versionOrURL
-	return versionOrURL, nil
+	resolved := path.Base(url.Path)
+	cachedK8sVersion[config.KubernetesVersion] = resolved
+	logrus.Infof("Resolving Kubernetes version [%s] to %s from %s ", config.KubernetesVersion, resolved, versionOrURL)
+	return resolved, nil
 }
 
 func RancherVersion(config *config.Config) (string, error) {
@@ -82,8 +84,11 @@ func RancherVersion(config *config.Config) (string, error) {
 		return cached, nil
 	}
 
-	versionOrURL, isURL := getVersionOrURL("https://releases.rancher.com/server-charts/%s/index.yaml", "master-head", config.RancherVersion)
+	versionOrURL, isURL := getVersionOrURL("https://releases.rancher.com/server-charts/%s/index.yaml", "stable", config.RancherVersion)
 	if !isURL {
+		if !strings.HasPrefix(versionOrURL, "v") {
+			return "v" + versionOrURL, nil
+		}
 		return versionOrURL, nil
 	}
 
@@ -103,8 +108,13 @@ func RancherVersion(config *config.Config) (string, error) {
 		return "", fmt.Errorf("failed to find version for rancher chart at (%s)", versionOrURL)
 	}
 
-	cachedRancherVersion[config.RancherVersion] = versions[0].Version
-	return versions[0].Version, nil
+	version := versions[0].Version
+	if !strings.HasPrefix(version, "v") {
+		version = "v" + version
+	}
+
+	cachedRancherVersion[config.RancherVersion] = version
+	return version, nil
 }
 
 type chartIndex struct {
