@@ -18,10 +18,14 @@ import (
 )
 
 func Run(ctx context.Context, cfg *config.Config, plan *applyinator.Plan, dataDir string) error {
-	k8sVersion, err := versions.K8sVersion(cfg)
+	k8sVersion, err := versions.K8sVersion(cfg.KubernetesVersion)
 	if err != nil {
 		return err
 	}
+	return RunWithKubernetesVersion(ctx, k8sVersion, plan, dataDir)
+}
+
+func RunWithKubernetesVersion(ctx context.Context, k8sVersion string, plan *applyinator.Plan, dataDir string) error {
 	runtime := config.GetRuntime(k8sVersion)
 
 	if err := writePlan(plan, dataDir); err != nil {

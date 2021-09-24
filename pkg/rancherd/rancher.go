@@ -14,6 +14,8 @@ import (
 	"sigs.k8s.io/yaml"
 )
 
+const DefaultDataDir = "/var/lib/rancher/rancherd"
+
 type Config struct {
 	Force      bool
 	DataDir    string
@@ -45,12 +47,12 @@ func (r *Rancherd) execute(ctx context.Context) error {
 		return nil
 	}
 
-	k8sVersion, err := versions.K8sVersion(&cfg)
+	k8sVersion, err := versions.K8sVersion(cfg.KubernetesVersion)
 	if err != nil {
 		return err
 	}
 
-	rancherVersion, err := versions.RancherVersion(&cfg)
+	rancherVersion, err := versions.RancherVersion(cfg.RancherVersion)
 	if err != nil {
 		return err
 	}
