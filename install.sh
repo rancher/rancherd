@@ -410,7 +410,6 @@ service_enable_and_start() {
     systemd_enable
 
     [ "${INSTALL_RANCHERD_SKIP_START}" = true ] && return
-    [ ! -e /etc/rancher/rancherd/config.yaml ] && return
 
     POST_INSTALL_HASHES=$(get_installed_hashes)
     if [ "${PRE_INSTALL_HASHES}" = "${POST_INSTALL_HASHES}" ] && [ "${INSTALL_RANCHERD_FORCE_RESTART}" != true ]; then
