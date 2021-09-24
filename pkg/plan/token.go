@@ -34,13 +34,12 @@ func assignTokenIfUnset(cfg *config.Config) error {
 }
 
 func existingToken(cfg *config.Config) (string, error) {
-	k8sVersions, err := versions.K8sVersion(cfg)
+	k8sVersion, err := versions.K8sVersion(cfg.KubernetesVersion)
 	if err != nil {
 		return "", err
 	}
 
-	cfgFile := runtime.GetConfigLocation(config.GetRuntime(k8sVersions))
-
+	cfgFile := runtime.GetConfigLocation(config.GetRuntime(k8sVersion))
 	data, err := ioutil.ReadFile(cfgFile)
 	if os.IsNotExist(err) {
 		return "", nil
@@ -49,7 +48,7 @@ func existingToken(cfg *config.Config) (string, error) {
 	}
 
 	configMap := map[string]interface{}{}
-	if err := yaml.Unmarshal(data, configMap); err != nil {
+	if err := yaml.Unmarshal(data, &configMap); err != nil {
 		return "", err
 	}
 

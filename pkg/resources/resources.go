@@ -57,7 +57,7 @@ func ToBootstrapFile(config *config.Config, path string) (*applyinator.File, err
 		nodeName = strings.Split(hostname, ".")[0]
 	}
 
-	k8sVersion, err := versions.K8sVersion(config)
+	k8sVersion, err := versions.K8sVersion(config.KubernetesVersion)
 	if err != nil {
 		return nil, err
 	}

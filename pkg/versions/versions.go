@@ -7,7 +7,6 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/rancher/rancherd/pkg/config"
 	"github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
 )
@@ -44,16 +43,21 @@ func getVersionOrURL(urlFormat, def, version string) (_ string, isURL bool) {
 	return channelURL, true
 }
 
-func K8sVersion(config *config.Config) (string, error) {
+func K8sVersion(kubernetesVersion string) (string, error) {
 	cachedLock.Lock()
 	defer cachedLock.Unlock()
 
-	cached, ok := cachedK8sVersion[config.KubernetesVersion]
+	cached, ok := cachedK8sVersion[kubernetesVersion]
 	if ok {
 		return cached, nil
 	}
 
-	versionOrURL, isURL := getVersionOrURL("https://update.k3s.io/v1-release/channels/%s", "stable", config.KubernetesVersion)
+	urlFormat := "https://update.k3s.io/v1-release/channels/%s"
+	if strings.Contains(kubernetesVersion, "rke2") {
+		urlFormat = "https://update.rke2.io/v1-release/channels/%s"
+	}
+
+	versionOrURL, isURL := getVersionOrURL(urlFormat, "stable", kubernetesVersion)
 	if !isURL {
 		return versionOrURL, nil
 	}
@@ -70,21 +74,21 @@ func K8sVersion(config *config.Config) (string, error) {
 	}
 
 	resolved := path.Base(url.Path)
-	cachedK8sVersion[config.KubernetesVersion] = resolved
-	logrus.Infof("Resolving Kubernetes version [%s] to %s from %s ", config.KubernetesVersion, resolved, versionOrURL)
+	cachedK8sVersion[kubernetesVersion] = resolved
+	logrus.Infof("Resolving Kubernetes version [%s] to %s from %s ", kubernetesVersion, resolved, versionOrURL)
 	return resolved, nil
 }
 
-func RancherVersion(config *config.Config) (string, error) {
+func RancherVersion(rancherVersion string) (string, error) {
 	cachedLock.Lock()
 	defer cachedLock.Unlock()
 
-	cached, ok := cachedRancherVersion[config.RancherVersion]
+	cached, ok := cachedRancherVersion[rancherVersion]
 	if ok {
 		return cached, nil
 	}
 
-	versionOrURL, isURL := getVersionOrURL("https://releases.rancher.com/server-charts/%s/index.yaml", "stable", config.RancherVersion)
+	versionOrURL, isURL := getVersionOrURL("https://releases.rancher.com/server-charts/%s/index.yaml", "stable", rancherVersion)
 	if !isURL {
 		if !strings.HasPrefix(versionOrURL, "v") {
 			return "v" + versionOrURL, nil
@@ -113,7 +117,8 @@ func RancherVersion(config *config.Config) (string, error) {
 		version = "v" + version
 	}
 
-	cachedRancherVersion[config.RancherVersion] = version
+	logrus.Infof("Resolving RancherVersion version [%s] to %s from %s ", rancherVersion, version, versionOrURL)
+	cachedRancherVersion[rancherVersion] = version
 	return version, nil
 }
 
