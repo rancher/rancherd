@@ -27,7 +27,7 @@ var (
 		// RancherOS oem location
 		"/oem/rancher/rancherd/config.yaml",
 		// Standard cloud-config
-		"/var/lib/cloud/instance/data/user-data.txt",
+		"/var/lib/cloud/instance/user-data.txt",
 	}
 
 	manifests = []string{
