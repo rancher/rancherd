@@ -3,9 +3,11 @@ package main
 import (
 	"github.com/rancher/rancherd/cmd/rancherd/bootstrap"
 	"github.com/rancher/rancherd/cmd/rancherd/gettoken"
+	"github.com/rancher/rancherd/cmd/rancherd/info"
 	"github.com/rancher/rancherd/cmd/rancherd/probe"
 	"github.com/rancher/rancherd/cmd/rancherd/resetadmin"
 	"github.com/rancher/rancherd/cmd/rancherd/retry"
+	"github.com/rancher/rancherd/cmd/rancherd/upgrade"
 	cli "github.com/rancher/wrangler-cli"
 	"github.com/spf13/cobra"
 )
@@ -27,6 +29,8 @@ func main() {
 		resetadmin.NewResetAdmin(),
 		probe.NewProbe(),
 		retry.NewRetry(),
+		upgrade.NewUpgrade(),
+		info.NewInfo(),
 	)
 	cli.Main(root)
 }

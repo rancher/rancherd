@@ -62,6 +62,9 @@ func toJoinPlan(cfg *config.Config, dataDir string) (*applyinator.Plan, error) {
 	if err := plan.addInstruction(join.ToInstruction(cfg, dataDir)); err != nil {
 		return nil, err
 	}
+	if err := plan.addInstruction(probe.ToInstruction(cfg.RuntimeInstallerImage, cfg.SystemDefaultRegistry, k8sVersion)); err != nil {
+		return nil, err
+	}
 	if err := plan.addProbesForRoles(cfg); err != nil {
 		return nil, err
 	}
@@ -109,7 +112,19 @@ func (p *plan) addInstructions(cfg *config.Config, dataDir string) error {
 		return err
 	}
 
-	return p.addInstruction(resources.ToInstruction(cfg.RancherInstallerImage, cfg.SystemDefaultRegistry, k8sVersion, dataDir))
+	if err := p.addInstruction(resources.ToInstruction(cfg.RancherInstallerImage, cfg.SystemDefaultRegistry, k8sVersion, dataDir)); err != nil {
+		return err
+	}
+
+	if err := p.addInstruction(rancher.ToWaitSUCInstruction(cfg.RancherInstallerImage, cfg.SystemDefaultRegistry, k8sVersion)); err != nil {
+		return err
+	}
+
+	if err := p.addInstruction(rancher.ToWaitSUCPlanInstruction(cfg.RancherInstallerImage, cfg.SystemDefaultRegistry, k8sVersion)); err != nil {
+		return err
+	}
+
+	return p.addInstruction(runtime.ToWaitKubernetesInstruction(cfg.RuntimeInstallerImage, cfg.SystemDefaultRegistry, k8sVersion))
 }
 
 func (p *plan) addInstruction(instruction *applyinator.Instruction, err error) error {

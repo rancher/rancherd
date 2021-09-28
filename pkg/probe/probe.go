@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/rancher/rancherd/pkg/config"
-	"github.com/rancher/rancherd/pkg/images"
 	"github.com/rancher/rancherd/pkg/roles"
 	"github.com/rancher/rancherd/pkg/self"
 	"github.com/rancher/system-agent/pkg/applyinator"
@@ -94,7 +93,6 @@ func ToInstruction(imageOverride string, systemDefaultRegistry string, k8sVersio
 	return &applyinator.Instruction{
 		Name:       "probes",
 		SaveOutput: true,
-		Image:      images.GetInstallerImage(imageOverride, systemDefaultRegistry, k8sVersion),
 		Args:       []string{"probe"},
 		Command:    cmd,
 	}, nil

@@ -76,19 +76,6 @@ func ToBootstrapFile(config *config.Config, path string) (*applyinator.File, err
 	}
 
 	resources := config.Resources
-	if config.Git != nil {
-		resources = append(resources, v1.GenericMap{
-			Data: map[string]interface{}{
-				"kind":       "GitRepo",
-				"apiVersion": "fleet.cattle.io/v1alpha1",
-				"metadata": map[string]interface{}{
-					"name":      "rancherd-bootstrap",
-					"namespace": "fleet-local",
-				},
-				"spec": config.Git,
-			},
-		})
-	}
 	return ToFile(append(resources, v1.GenericMap{
 		Data: map[string]interface{}{
 			"kind":       "Node",

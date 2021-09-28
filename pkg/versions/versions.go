@@ -53,8 +53,11 @@ func K8sVersion(kubernetesVersion string) (string, error) {
 	}
 
 	urlFormat := "https://update.k3s.io/v1-release/channels/%s"
-	if strings.Contains(kubernetesVersion, "rke2") {
+	if strings.HasSuffix(kubernetesVersion, ":k3s") {
+		kubernetesVersion = strings.TrimSuffix(kubernetesVersion, ":k3s")
+	} else if strings.HasSuffix(kubernetesVersion, ":rke2") {
 		urlFormat = "https://update.rke2.io/v1-release/channels/%s"
+		kubernetesVersion = strings.TrimSuffix(kubernetesVersion, ":rke2")
 	}
 
 	versionOrURL, isURL := getVersionOrURL(urlFormat, "stable", kubernetesVersion)
@@ -88,11 +91,8 @@ func RancherVersion(rancherVersion string) (string, error) {
 		return cached, nil
 	}
 
-	versionOrURL, isURL := getVersionOrURL("https://releases.rancher.com/server-charts/%s/index.yaml", "stable", rancherVersion)
+	versionOrURL, isURL := getVersionOrURL("https://releases.rancher.com/server-charts/%s/index.yaml", "latest", rancherVersion)
 	if !isURL {
-		if !strings.HasPrefix(versionOrURL, "v") {
-			return "v" + versionOrURL, nil
-		}
 		return versionOrURL, nil
 	}
 
@@ -112,10 +112,7 @@ func RancherVersion(rancherVersion string) (string, error) {
 		return "", fmt.Errorf("failed to find version for rancher chart at (%s)", versionOrURL)
 	}
 
-	version := versions[0].Version
-	if !strings.HasPrefix(version, "v") {
-		version = "v" + version
-	}
+	version := "v" + versions[0].Version
 
 	logrus.Infof("Resolving RancherVersion version [%s] to %s from %s ", rancherVersion, version, versionOrURL)
 	cachedRancherVersion[rancherVersion] = version
