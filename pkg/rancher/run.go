@@ -17,7 +17,8 @@ var defaultValues = map[string]interface{}{
 		"enabled": false,
 	},
 	"features":       "multi-cluster-management=false",
-	"replicas":       -2,
+	"antiAffinity":   "required",
+	"replicas":       -3,
 	"tls":            "external",
 	"hostPort":       8443,
 	"noDefaultAdmin": true,
@@ -50,5 +51,14 @@ func ToInstruction(imageOverride, systemDefaultRegistry, k8sVersion, rancherVers
 		SaveOutput: true,
 		Image:      images.GetRancherInstallerImage(imageOverride, systemDefaultRegistry, rancherVersion),
 		Env:        append(kubectl.Env(k8sVersion), fmt.Sprintf("RANCHER_VALUES=%s", GetRancherValues(dataDir))),
+	}, nil
+}
+
+func ToUpgradeInstruction(imageOverride, systemDefaultRegistry, k8sVersion, rancherVersion, dataDir string) (*applyinator.Instruction, error) {
+	return &applyinator.Instruction{
+		Name:       "rancher",
+		SaveOutput: true,
+		Image:      images.GetRancherInstallerImage(imageOverride, systemDefaultRegistry, rancherVersion),
+		Env:        kubectl.Env(k8sVersion),
 	}, nil
 }

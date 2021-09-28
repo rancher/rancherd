@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/rancher/fleet/pkg/apis/fleet.cattle.io/v1alpha1"
 	v1 "github.com/rancher/rancher/pkg/apis/rke.cattle.io/v1"
 	"github.com/rancher/rancher/pkg/apis/rke.cattle.io/v1/plan"
 	"github.com/rancher/wharfie/pkg/registries"
@@ -46,7 +45,6 @@ type Config struct {
 	RancherVersion    string           `json:"rancherVersion,omitempty"`
 	Server            string           `json:"server,omitempty"`
 	Discovery         *DiscoveryConfig `json:"discovery,omitempty"`
-	Role              string           `json:"role,omitempty"`
 
 	RancherValues    map[string]interface{} `json:"rancherValues,omitempty"`
 	PreInstructions  []plan.Instruction     `json:"preInstructions,omitempty"`
@@ -55,11 +53,10 @@ type Config struct {
 	BootstrapResources []v1.GenericMap `json:"bootstrapResources,omitempty"`
 	Resources          []v1.GenericMap `json:"resources,omitempty"`
 
-	RuntimeInstallerImage string                `json:"runtimeInstallerImage,omitempty"`
-	RancherInstallerImage string                `json:"rancherInstallerImage,omitempty"`
-	SystemDefaultRegistry string                `json:"systemDefaultRegistry,omitempty"`
-	Registries            *registries.Registry  `json:"registries,omitempty"`
-	Git                   *v1alpha1.GitRepoSpec `json:"git,omitempty"`
+	RuntimeInstallerImage string               `json:"runtimeInstallerImage,omitempty"`
+	RancherInstallerImage string               `json:"rancherInstallerImage,omitempty"`
+	SystemDefaultRegistry string               `json:"systemDefaultRegistry,omitempty"`
+	Registries            *registries.Registry `json:"registries,omitempty"`
 }
 
 type DiscoveryConfig struct {

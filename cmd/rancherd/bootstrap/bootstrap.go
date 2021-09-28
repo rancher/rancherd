@@ -13,16 +13,16 @@ func NewBootstrap() *cobra.Command {
 }
 
 type Bootstrap struct {
-	Force bool `usage:"Run bootstrap even if already bootstrapped"`
+	Force bool `usage:"Run bootstrap even if already bootstrapped" short:"f"`
 	//DataDir string `usage:"Path to rancherd state" default:"/var/lib/rancher/rancherd"`
-	Config string `usage:"Custom config path" default:"/etc/rancher/rancherd/config.yaml" short:"c"`
+	//Config string `usage:"Custom config path" default:"/etc/rancher/rancherd/config.yaml" short:"c"`
 }
 
 func (b *Bootstrap) Run(cmd *cobra.Command, args []string) error {
 	r := rancherd.New(rancherd.Config{
 		Force:      b.Force,
 		DataDir:    rancherd.DefaultDataDir,
-		ConfigPath: b.Config,
+		ConfigPath: rancherd.DefaultConfigFile,
 	})
 	return r.Run(cmd.Context())
 }

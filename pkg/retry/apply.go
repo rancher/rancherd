@@ -17,7 +17,7 @@ func Retry(ctx context.Context, interval time.Duration, args []string) error {
 		cmd.Stderr = os.Stderr
 		err := cmd.Run()
 		if err != nil {
-			logrus.Errorf("failed to run %v: %v", args, err)
+			logrus.Errorf("will retry failed command %v: %v", args, err)
 			select {
 			case <-time.After(interval):
 				continue
