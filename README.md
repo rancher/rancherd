@@ -206,6 +206,9 @@ replicas: -3
 tls: external
 ```
 
+A full reference of all parameters in the values.yaml is available in
+the [Rancher repo](https://github.com/rancher/rancher/blob/release/v2.6/chart/values.yaml).
+
 ## Dashboard/UI
 
 The Rancher UI is running by default on port `:8443`.  There is no default
