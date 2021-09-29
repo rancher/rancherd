@@ -135,7 +135,7 @@ address: 123.123.123.123
 internalAddress: 123.123.123.124
 # Taints to apply to this node upon creation
 taints:
-- foo:bar:baz
+- dedicated=special-user:NoSchedule
 # Labels to apply to this node upon creation
 labels:
 - key=value
