@@ -47,7 +47,7 @@ curl -fL https://raw.githubusercontent.com/rancher/rancherd/master/install.sh | 
 
 ### cloud-init
 
-The primary way of running Rancherd is intended to be done from.
+The primary way of running Rancherd is intended to be done from cloud-init.
 Add to your cloud-init the following for a single node cluster. All
 configuration that would be found in the rancherd config.yaml should
 be embedded in the `rancherd` key in the cloud-config.
