@@ -70,7 +70,7 @@ and manually ran.
 The below command will download `rancherd` binary and setup a systemd unit and run it.
 
 ```bash
-curl -sfL https://https://raw.githubusercontent.com/rancher/rancherd/master/install.sh | sh -
+curl -sfL https://raw.githubusercontent.com/rancher/rancherd/master/install.sh | sh -
 ```
  
 ## Cluster Initialization
