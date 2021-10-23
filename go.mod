@@ -33,7 +33,6 @@ replace (
 require (
 	github.com/hashicorp/go-discover v0.0.0-20201029210230-738cb3105cd0
 	github.com/pkg/errors v0.9.1
-	github.com/rancher/fleet/pkg/apis v0.0.0-20210920165712-667022c1d661
 	github.com/rancher/rancher/pkg/apis v0.0.0-20210920193801-79027c456224
 	github.com/rancher/system-agent v0.0.1-alpha30
 	github.com/rancher/wharfie v0.3.2

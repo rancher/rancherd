@@ -28,6 +28,14 @@ var insecureClient = &http.Client{
 }
 
 func Get(server, token, path string) ([]byte, string, error) {
+	return get(server, token, path, true)
+}
+
+func MachineGet(server, token, path string) ([]byte, string, error) {
+	return get(server, token, path, false)
+}
+
+func get(server, token, path string, clusterToken bool) ([]byte, string, error) {
 	u, err := url2.Parse(server)
 	if err != nil {
 		return nil, "", err
@@ -38,8 +46,11 @@ func Get(server, token, path string) ([]byte, string, error) {
 	if err != nil {
 		return nil, "", err
 	}
+	if !clusterToken {
+		req.Header.Set("Authorization", "Bearer "+base64.StdEncoding.EncodeToString([]byte(token)))
+	}
 
-	cacert, caChecksum, err := CACerts(server, token)
+	cacert, caChecksum, err := CACerts(server, token, clusterToken)
 	if err != nil {
 		return nil, "", err
 	}
@@ -71,10 +82,13 @@ func Get(server, token, path string) ([]byte, string, error) {
 	}
 
 	data, err := ioutil.ReadAll(resp.Body)
+	if resp.StatusCode != http.StatusOK {
+		return nil, "", fmt.Errorf("%s: %s", resp.Status, data)
+	}
 	return data, caChecksum, err
 }
 
-func CACerts(server, token string) ([]byte, string, error) {
+func CACerts(server, token string, clusterToken bool) ([]byte, string, error) {
 	nonce, err := randomtoken.Generate()
 	if err != nil {
 		return nil, "", err
@@ -86,6 +100,9 @@ func CACerts(server, token string) ([]byte, string, error) {
 	}
 
 	requestURL := fmt.Sprintf("https://%s/cacerts", url.Host)
+	if !clusterToken {
+		requestURL = fmt.Sprintf("https://%s/v1-rancheros/cacerts", url.Host)
+	}
 	req, err := http.NewRequest(http.MethodGet, requestURL, nil)
 	if err != nil {
 		return nil, "", err

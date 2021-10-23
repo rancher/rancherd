@@ -2,12 +2,13 @@ package plan
 
 import (
 	"github.com/rancher/rancherd/pkg/config"
+	"github.com/rancher/rancherd/pkg/os"
 	"github.com/rancher/rancherd/pkg/rancher"
 	"github.com/rancher/rancherd/pkg/runtime"
 	"github.com/rancher/system-agent/pkg/applyinator"
 )
 
-func Upgrade(cfg *config.Config, k8sVersion, rancherVersion, dataDir string) (*applyinator.Plan, error) {
+func Upgrade(cfg *config.Config, k8sVersion, rancherVersion, rancherOSVersion, dataDir string) (*applyinator.Plan, error) {
 	p := plan{}
 
 	if rancherVersion != "" {
@@ -24,6 +25,12 @@ func Upgrade(cfg *config.Config, k8sVersion, rancherVersion, dataDir string) (*a
 			return nil, err
 		}
 		if err := p.addInstruction(runtime.ToWaitKubernetesInstruction("", cfg.SystemDefaultRegistry, k8sVersion)); err != nil {
+			return nil, err
+		}
+	}
+
+	if rancherOSVersion != "" {
+		if err := p.addInstruction(os.ToUpgradeInstruction(k8sVersion, rancherOSVersion)); err != nil {
 			return nil, err
 		}
 	}

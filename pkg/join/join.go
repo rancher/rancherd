@@ -42,7 +42,7 @@ func ToInstruction(config *config.Config, dataDir string) (*applyinator.Instruct
 		return nil, fmt.Errorf("invalid role (%s) defined", config.Role)
 	}
 
-	_, caChecksum, err := cacerts.CACerts(config.Server, config.Token)
+	_, caChecksum, err := cacerts.CACerts(config.Server, config.Token, true)
 	if err != nil {
 		return nil, err
 	}

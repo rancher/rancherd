@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"time"
 
 	"github.com/rancher/rancherd/pkg/config"
 	"github.com/rancher/rancherd/pkg/images"
@@ -18,7 +17,7 @@ func ToInstruction(imageOverride string, systemDefaultRegistry string, k8sVersio
 	return &applyinator.Instruction{
 		Name: string(runtime),
 		Env: []string{
-			"RESTART_STAMP=" + time.Now().String(),
+			"RESTART_STAMP=" + images.GetInstallerImage(imageOverride, systemDefaultRegistry, k8sVersion),
 		},
 		Image:      images.GetInstallerImage(imageOverride, systemDefaultRegistry, k8sVersion),
 		SaveOutput: true,

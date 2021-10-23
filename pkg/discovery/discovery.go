@@ -41,14 +41,14 @@ var (
 
 func DiscoverServerAndRole(ctx context.Context, cfg *config.Config) error {
 	if cfg.Discovery == nil {
-		if cfg.Server == "" && cfg.Role == "server" && cfg.Token == "" {
+		if cfg.Server == "" && cfg.Role == "server" {
 			cfg.Role = "cluster-init"
 		}
 		return nil
 	}
 
 	if cfg.Token == "" {
-		return fmt.Errorf("token is required to be set")
+		return fmt.Errorf("token is required to be set when discovery is set")
 	}
 
 	server, clusterInit, err := discoverServerAndRole(ctx, cfg)

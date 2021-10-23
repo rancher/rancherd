@@ -7,6 +7,7 @@ import (
 	"github.com/rancher/rancherd/pkg/config"
 	"github.com/rancher/rancherd/pkg/discovery"
 	"github.com/rancher/rancherd/pkg/join"
+	"github.com/rancher/rancherd/pkg/kubectl"
 	"github.com/rancher/rancherd/pkg/probe"
 	"github.com/rancher/rancherd/pkg/rancher"
 	"github.com/rancher/rancherd/pkg/registry"
@@ -68,6 +69,8 @@ func toJoinPlan(cfg *config.Config, dataDir string) (*applyinator.Plan, error) {
 	if err := plan.addProbesForRoles(cfg); err != nil {
 		return nil, err
 	}
+
+	plan.addPrePostInstructions(cfg, "")
 	return (*applyinator.Plan)(&plan), nil
 }
 
@@ -124,7 +127,33 @@ func (p *plan) addInstructions(cfg *config.Config, dataDir string) error {
 		return err
 	}
 
-	return p.addInstruction(runtime.ToWaitKubernetesInstruction(cfg.RuntimeInstallerImage, cfg.SystemDefaultRegistry, k8sVersion))
+	if err := p.addInstruction(runtime.ToWaitKubernetesInstruction(cfg.RuntimeInstallerImage, cfg.SystemDefaultRegistry, k8sVersion)); err != nil {
+		return err
+	}
+
+	p.addPrePostInstructions(cfg, k8sVersion)
+	return nil
+}
+
+func (p *plan) addPrePostInstructions(cfg *config.Config, k8sVersion string) {
+	var instructions []applyinator.Instruction
+
+	for _, inst := range cfg.PreInstructions {
+		if k8sVersion != "" {
+			inst.Env = append(inst.Env, kubectl.Env(k8sVersion)...)
+		}
+		instructions = append(instructions, inst)
+	}
+
+	instructions = append(instructions, p.Instructions...)
+
+	for _, inst := range cfg.PostInstructions {
+		inst.Env = append(inst.Env, kubectl.Env(k8sVersion)...)
+		instructions = append(instructions, inst)
+	}
+
+	p.Instructions = instructions
+	return
 }
 
 func (p *plan) addInstruction(instruction *applyinator.Instruction, err error) error {

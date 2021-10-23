@@ -828,8 +828,6 @@ github.com/rancher/client-go v0.21.0-rancher.1 h1:WVy7jpVmdjIRVkgXpBRlNx4jnGkLCF
 github.com/rancher/client-go v0.21.0-rancher.1/go.mod h1:nNBytTF9qPFDEhoqgEPaarobC8QPae13bElIVHzIglA=
 github.com/rancher/eks-operator v1.1.1/go.mod h1:MIgvBMHO0MqPuvehwAGxpg7Zcg20GhYO1dXjh9BAHqs=
 github.com/rancher/fleet/pkg/apis v0.0.0-20210918015053-5a141a6b18f0/go.mod h1:fiKjX1CsAZhe2u1h/GWNDSc5Ol4+5Q3roWxq9cMbgHk=
-github.com/rancher/fleet/pkg/apis v0.0.0-20210920165712-667022c1d661 h1:5z1ey2n0NvONqwjnRfb3+qg52P4zCqqn0VqFZ5oCxqo=
-github.com/rancher/fleet/pkg/apis v0.0.0-20210920165712-667022c1d661/go.mod h1:fiKjX1CsAZhe2u1h/GWNDSc5Ol4+5Q3roWxq9cMbgHk=
 github.com/rancher/gke-operator v1.1.1/go.mod h1:o2EC1q3xO3gq0vRid1CbaEvvXnWdptT7wiGPRPwUJqY=
 github.com/rancher/lasso v0.0.0-20200427171700-e0509f89f319/go.mod h1:6Dw19z1lDIpL887eelVjyqH/mna1hfR61ddCFOG78lw=
 github.com/rancher/lasso v0.0.0-20200515155337-a34e1e26ad91/go.mod h1:G6Vv2aj6xB2YjTVagmu4NkhBvbE8nBcGykHRENH6arI=
@@ -1565,7 +1563,6 @@ rsc.io/pdf v0.1.1/go.mod h1:n8OzWcQ6Sp37PL01nO98y4iUCRdTGarVfzxY20ICaU4=
 rsc.io/quote/v3 v3.1.0/go.mod h1:yEA65RcK8LyAZtP9Kv3t0HmxON59tX3rD+tICJqUlj0=
 rsc.io/sampler v1.3.0/go.mod h1:T1hPZKmBbMNahiBKFy5HrXp6adAjACjK9JXDnKaTXpA=
 sigs.k8s.io/apiserver-network-proxy/konnectivity-client v0.0.15/go.mod h1:LEScyzhFmoF5pso/YSeBstl57mOzx9xlU9n85RGrDQg=
-sigs.k8s.io/cli-utils v0.16.0 h1:Wr32m1oxjIqc9G9l+igr13PeIM9LCyq8jQ8KjXKelvg=
 sigs.k8s.io/cli-utils v0.16.0/go.mod h1:9Jqm9K2W6ShhCxsEuaz6HSRKKOXigPUx3ZfypGgxBLY=
 sigs.k8s.io/cluster-api v0.3.11-0.20210430180359-45b6080c2764 h1:KR5002Y1x1g+BYmsoaODC/Z43xdKSY0B6bOcwfBa9Bk=
 sigs.k8s.io/cluster-api v0.3.11-0.20210430180359-45b6080c2764/go.mod h1:iDmIO2c5/RSiSciQnI7Xocfe8hTu+KafcgEuc/hnhS4=

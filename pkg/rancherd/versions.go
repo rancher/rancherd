@@ -1,12 +1,15 @@
 package rancherd
 
 import (
+	"bufio"
 	"bytes"
 	"compress/gzip"
 	"context"
 	"encoding/base64"
 	"encoding/json"
 	"io/ioutil"
+	"runtime"
+	"strings"
 
 	"github.com/rancher/rancherd/pkg/kubectl"
 	data2 "github.com/rancher/wrangler/pkg/data"
@@ -16,28 +19,28 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 )
 
-func (r *Rancherd) getExistingVersions(ctx context.Context) (rancherVersion string, k8sVersion string) {
+func (r *Rancherd) getExistingVersions(ctx context.Context) (rancherVersion, k8sVersion, rancherOSVersion string) {
 	kubeConfig, err := kubectl.GetKubeconfig("")
 	if err != nil {
-		return "", ""
+		return "", "", ""
 	}
 
 	data, err := ioutil.ReadFile(kubeConfig)
 	if err != nil {
-		return "", ""
+		return "", "", ""
 	}
 
 	restConfig, err := clientcmd.RESTConfigFromKubeConfig(data)
 	if err != nil {
-		return "", ""
+		return "", "", ""
 	}
 
 	k8s, err := kubernetes.NewForConfig(restConfig)
 	if err != nil {
-		return "", ""
+		return "", "", ""
 	}
 
-	return getRancherVersion(ctx, k8s), getK8sVersion(ctx, k8s)
+	return getRancherVersion(ctx, k8s), getK8sVersion(ctx, k8s), getRancherOSVersion()
 }
 
 func getRancherVersion(ctx context.Context, k8s kubernetes.Interface) string {
@@ -79,4 +82,19 @@ func getK8sVersion(ctx context.Context, k8s kubernetes.Interface) string {
 		return ""
 	}
 	return nodes.Items[0].Status.NodeInfo.KubeletVersion
+}
+
+func getRancherOSVersion() string {
+	data, err := ioutil.ReadFile("/usr/lib/rancheros-release")
+	if err != nil {
+		return ""
+	}
+
+	scan := bufio.NewScanner(bytes.NewBuffer(data))
+	for scan.Scan() {
+		if strings.HasPrefix(scan.Text(), "IMAGE=") {
+			return strings.TrimSuffix(strings.TrimPrefix(scan.Text(), "IMAGE="), "-"+runtime.GOARCH)
+		}
+	}
+	return ""
 }

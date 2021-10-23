@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	v1 "github.com/rancher/rancher/pkg/apis/rke.cattle.io/v1"
-	"github.com/rancher/rancher/pkg/apis/rke.cattle.io/v1/plan"
+	"github.com/rancher/system-agent/pkg/applyinator"
 	"github.com/rancher/wharfie/pkg/registries"
 	"github.com/rancher/wrangler/pkg/data"
 	"github.com/rancher/wrangler/pkg/data/convert"
@@ -46,9 +46,9 @@ type Config struct {
 	Server            string           `json:"server,omitempty"`
 	Discovery         *DiscoveryConfig `json:"discovery,omitempty"`
 
-	RancherValues    map[string]interface{} `json:"rancherValues,omitempty"`
-	PreInstructions  []plan.Instruction     `json:"preInstructions,omitempty"`
-	PostInstructions []plan.Instruction     `json:"postInstructions,omitempty"`
+	RancherValues    map[string]interface{}    `json:"rancherValues,omitempty"`
+	PreInstructions  []applyinator.Instruction `json:"preInstructions,omitempty"`
+	PostInstructions []applyinator.Instruction `json:"postInstructions,omitempty"`
 	// Deprecated, use Resources instead
 	BootstrapResources []v1.GenericMap `json:"bootstrapResources,omitempty"`
 	Resources          []v1.GenericMap `json:"resources,omitempty"`
@@ -111,7 +111,11 @@ func Load(path string) (result Config, err error) {
 	}
 
 	err = convert.ToObj(values, &result)
-	return
+	if err != nil {
+		return
+	}
+
+	return processRemote(result)
 }
 
 func populatedSystemResources(config *Config) error {

@@ -13,6 +13,7 @@ import (
 
 var (
 	cachedK8sVersion     = map[string]string{}
+	cachedOSVersion      = map[string]string{}
 	cachedRancherVersion = map[string]string{}
 	cachedLock           sync.Mutex
 	redirectClient       = &http.Client{
@@ -34,7 +35,7 @@ func getVersionOrURL(urlFormat, def, version string) (_ string, isURL bool) {
 	channelURL := version
 	if !strings.HasPrefix(channelURL, "https://") &&
 		!strings.HasPrefix(channelURL, "http://") {
-		if strings.HasSuffix(channelURL, "-head") {
+		if strings.HasSuffix(channelURL, "-head") || strings.Contains(channelURL, "/") {
 			return channelURL, false
 		}
 		channelURL = fmt.Sprintf(urlFormat, version)
@@ -117,6 +118,38 @@ func RancherVersion(rancherVersion string) (string, error) {
 	logrus.Infof("Resolving RancherVersion version [%s] to %s from %s ", rancherVersion, version, versionOrURL)
 	cachedRancherVersion[rancherVersion] = version
 	return version, nil
+}
+
+func RancherOSVersion(rancherOSVersion string) (string, error) {
+	cachedLock.Lock()
+	defer cachedLock.Unlock()
+
+	cached, ok := cachedOSVersion[rancherOSVersion]
+	if ok {
+		return cached, nil
+	}
+
+	urlFormat := "https://github.com/rancher/os2/releases/%s"
+	versionOrURL, isURL := getVersionOrURL(urlFormat, "latest", rancherOSVersion)
+	if !isURL {
+		return versionOrURL, nil
+	}
+
+	resp, err := redirectClient.Get(versionOrURL)
+	if err != nil {
+		return "", fmt.Errorf("getting channel version from (%s): %w", versionOrURL, err)
+	}
+	defer resp.Body.Close()
+
+	url, err := resp.Location()
+	if err != nil {
+		return "", fmt.Errorf("getting channel version URL from (%s): %w", versionOrURL, err)
+	}
+
+	resolved := "rancher/os2:" + path.Base(url.Path)
+	cachedOSVersion[rancherOSVersion] = resolved
+	logrus.Infof("Resolving RancherOS version [%s] to %s from %s ", rancherOSVersion, resolved, versionOrURL)
+	return resolved, nil
 }
 
 type chartIndex struct {

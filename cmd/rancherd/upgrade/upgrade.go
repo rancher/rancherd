@@ -14,6 +14,7 @@ func NewUpgrade() *cobra.Command {
 
 type Upgrade struct {
 	RancherVersion    string `usage:"Target Rancher version" short:"r" default:"stable"`
+	RancherOSVersion  string `usage:"Target RancherOS version" short:"o" default:"latest" name:"rancher-os-version"`
 	KubernetesVersion string `usage:"Target Kubernetes version" short:"k" default:"stable"`
 	Force             bool   `usage:"Run without prompting for confirmation" short:"f"`
 }
@@ -27,5 +28,6 @@ func (b *Upgrade) Run(cmd *cobra.Command, args []string) error {
 	return r.Upgrade(cmd.Context(), rancherd.UpgradeConfig{
 		RancherVersion:    b.RancherVersion,
 		KubernetesVersion: b.KubernetesVersion,
+		RancherOSVersion:  b.RancherOSVersion,
 	})
 }
