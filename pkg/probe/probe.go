@@ -61,13 +61,13 @@ func replaceRuntime(str string, runtime config.Runtime) string {
 	return fmt.Sprintf(str, runtime)
 }
 
-func ProbesForRole(config *config.RuntimeConfig, runtime config.Runtime) map[string]prober.Probe {
-	if roles.IsControlPlane(config.Role) {
-		return AllProbes(runtime)
+func ProbesForJoin(cfg *config.RuntimeConfig) map[string]prober.Probe {
+	if roles.IsControlPlane(cfg.Role) {
+		return AllProbes(config.RuntimeUnknown)
 	}
 	return replaceRuntimeForProbes(map[string]prober.Probe{
 		"kubelet": probes["kubelet"],
-	}, runtime)
+	}, config.RuntimeUnknown)
 }
 
 func AllProbes(runtime config.Runtime) map[string]prober.Probe {
@@ -77,6 +77,12 @@ func AllProbes(runtime config.Runtime) map[string]prober.Probe {
 func replaceRuntimeForProbes(probes map[string]prober.Probe, runtime config.Runtime) map[string]prober.Probe {
 	result := map[string]prober.Probe{}
 	for k, v := range probes {
+		// we don't know the runtime to find the file
+		if runtime == config.RuntimeUnknown && (v.HTTPGetAction.CACert+
+			v.HTTPGetAction.ClientCert+
+			v.HTTPGetAction.ClientKey) != "" {
+			continue
+		}
 		v.HTTPGetAction.CACert = replaceRuntime(v.HTTPGetAction.CACert, runtime)
 		v.HTTPGetAction.ClientCert = replaceRuntime(v.HTTPGetAction.ClientCert, runtime)
 		v.HTTPGetAction.ClientKey = replaceRuntime(v.HTTPGetAction.ClientKey, runtime)
@@ -85,7 +91,7 @@ func replaceRuntimeForProbes(probes map[string]prober.Probe, runtime config.Runt
 	return result
 }
 
-func ToInstruction(imageOverride string, systemDefaultRegistry string, k8sVersion string) (*applyinator.Instruction, error) {
+func ToInstruction() (*applyinator.Instruction, error) {
 	cmd, err := self.Self()
 	if err != nil {
 		return nil, fmt.Errorf("resolving location of %s: %w", os.Args[0], err)

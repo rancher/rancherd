@@ -16,12 +16,11 @@ var defaultValues = map[string]interface{}{
 	"ingress": map[string]interface{}{
 		"enabled": false,
 	},
-	"features":       "multi-cluster-management=false",
-	"antiAffinity":   "required",
-	"replicas":       -3,
-	"tls":            "external",
-	"hostPort":       8443,
-	"noDefaultAdmin": true,
+	"features":     "multi-cluster-management=false",
+	"antiAffinity": "required",
+	"replicas":     -3,
+	"tls":          "external",
+	"hostPort":     8443,
 }
 
 func GetRancherValues(dataDir string) string {

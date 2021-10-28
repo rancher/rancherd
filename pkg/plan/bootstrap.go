@@ -49,28 +49,19 @@ func toJoinPlan(cfg *config.Config, dataDir string) (*applyinator.Plan, error) {
 	}
 
 	plan := plan{}
-	k8sVersion, err := versions.K8sVersion(cfg.KubernetesVersion)
-	if err != nil {
-		return nil, err
-	}
-
 	if err := plan.addFile(join.ToScriptFile(cfg, dataDir)); err != nil {
-		return nil, err
-	}
-	if err := plan.addFile(runtime.ToFile(&cfg.RuntimeConfig, config.GetRuntime(k8sVersion), false)); err != nil {
 		return nil, err
 	}
 	if err := plan.addInstruction(join.ToInstruction(cfg, dataDir)); err != nil {
 		return nil, err
 	}
-	if err := plan.addInstruction(probe.ToInstruction(cfg.RuntimeInstallerImage, cfg.SystemDefaultRegistry, k8sVersion)); err != nil {
+	if err := plan.addInstruction(probe.ToInstruction()); err != nil {
 		return nil, err
 	}
-	if err := plan.addProbesForRoles(cfg); err != nil {
+	if err := plan.addProbesForJoin(cfg); err != nil {
 		return nil, err
 	}
 
-	plan.addPrePostInstructions(cfg, "")
 	return (*applyinator.Plan)(&plan), nil
 }
 
@@ -95,7 +86,7 @@ func (p *plan) addInstructions(cfg *config.Config, dataDir string) error {
 		return err
 	}
 
-	if err := p.addInstruction(probe.ToInstruction(cfg.RuntimeInstallerImage, cfg.SystemDefaultRegistry, k8sVersion)); err != nil {
+	if err := p.addInstruction(probe.ToInstruction()); err != nil {
 		return err
 	}
 
@@ -204,12 +195,8 @@ func (p *plan) addFile(file *applyinator.File, err error) error {
 	return nil
 }
 
-func (p *plan) addProbesForRoles(cfg *config.Config) error {
-	k8sVersion, err := versions.K8sVersion(cfg.KubernetesVersion)
-	if err != nil {
-		return err
-	}
-	p.Probes = probe.ProbesForRole(&cfg.RuntimeConfig, config.GetRuntime(k8sVersion))
+func (p *plan) addProbesForJoin(cfg *config.Config) error {
+	p.Probes = probe.ProbesForJoin(&cfg.RuntimeConfig)
 	return nil
 }
 

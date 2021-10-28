@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/rancher/rancherd/cmd/rancherd/bootstrap"
 	"github.com/rancher/rancherd/cmd/rancherd/gettoken"
+	"github.com/rancher/rancherd/cmd/rancherd/gettpmhash"
 	"github.com/rancher/rancherd/cmd/rancherd/info"
 	"github.com/rancher/rancherd/cmd/rancherd/probe"
 	"github.com/rancher/rancherd/cmd/rancherd/resetadmin"
@@ -31,6 +32,7 @@ func main() {
 		retry.NewRetry(),
 		upgrade.NewUpgrade(),
 		info.NewInfo(),
+		gettpmhash.NewGetTPMHash(),
 	)
 	cli.Main(root)
 }
