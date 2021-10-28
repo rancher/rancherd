@@ -3,8 +3,9 @@ package config
 import "strings"
 
 var (
-	RuntimeRKE2 Runtime = "rke2"
-	RuntimeK3S  Runtime = "k3s"
+	RuntimeRKE2    Runtime = "rke2"
+	RuntimeK3S     Runtime = "k3s"
+	RuntimeUnknown Runtime = "unknown"
 )
 
 type Runtime string

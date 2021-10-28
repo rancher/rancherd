@@ -31,6 +31,9 @@ replace (
 )
 
 require (
+	github.com/google/certificate-transparency-go v1.1.2
+	github.com/google/go-attestation v0.3.2
+	github.com/gorilla/websocket v1.4.2
 	github.com/hashicorp/go-discover v0.0.0-20201029210230-738cb3105cd0
 	github.com/pkg/errors v0.9.1
 	github.com/rancher/rancher/pkg/apis v0.0.0-20210920193801-79027c456224
@@ -42,7 +45,7 @@ require (
 	github.com/spf13/cobra v1.1.3
 	golang.org/x/crypto v0.0.0-20210711020723-a769d52b0f97
 	gopkg.in/yaml.v2 v2.4.0
-	gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776
+	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 	k8s.io/api v0.21.3
 	k8s.io/apimachinery v0.21.3
 	k8s.io/client-go v12.0.0+incompatible

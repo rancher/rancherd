@@ -106,6 +106,9 @@ func discoverServerAndRole(ctx context.Context, cfg *config.Config) (string, boo
 }
 
 func (j *joinServer) addresses(params map[string]string, discovery *discover.Discover) ([]string, error) {
+	if params["provider"] == "mdns" {
+		params["v6"] = "false"
+	}
 	addrs, err := discovery.Addrs(discover.Config(params).String(), log.Default())
 	if err != nil {
 		return nil, err
@@ -146,7 +149,7 @@ func (j *joinServer) loop(ctx context.Context, count int, params map[string]stri
 		}
 		resp, err := insecureHTTPClient.Do(req)
 		if err != nil {
-			logrus.Errorf("failed to connect to %s: %v", url, err)
+			logrus.Infof("failed to connect to %s: %v", url, err)
 			allAgree = false
 			continue
 		}
@@ -154,7 +157,7 @@ func (j *joinServer) loop(ctx context.Context, count int, params map[string]stri
 		data, err := ioutil.ReadAll(resp.Body)
 		resp.Body.Close()
 		if err != nil || resp.StatusCode != http.StatusOK {
-			logrus.Errorf("failed to read response from %s: code %d: %v", url, resp.StatusCode, err)
+			logrus.Infof("failed to read response from %s: code %d: %v", url, resp.StatusCode, err)
 			allAgree = false
 			continue
 		}
@@ -179,6 +182,11 @@ func (j *joinServer) loop(ctx context.Context, count int, params map[string]stri
 			allAgree = false
 			continue
 		}
+	}
+
+	if len(addrs) == 0 {
+		logrus.Infof("No available peers")
+		return "", false
 	}
 
 	if firstID != j.id {
@@ -219,7 +227,7 @@ func newJoinServer(ctx context.Context, cacheDuration string, port int64) (*join
 	}
 
 	if cacheDuration == "" {
-		cacheDuration = "5m"
+		cacheDuration = "1m"
 	}
 
 	duration, err := time.ParseDuration(cacheDuration)

@@ -14,6 +14,7 @@ import (
 	url2 "net/url"
 	"time"
 
+	"github.com/rancher/rancherd/pkg/tpm"
 	"github.com/rancher/wrangler/pkg/randomtoken"
 )
 
@@ -42,17 +43,32 @@ func get(server, token, path string, clusterToken bool) ([]byte, string, error) 
 	}
 	u.Path = path
 
+	var (
+		isTPM bool
+	)
+	if !clusterToken {
+		isTPM, token, err = tpm.ResolveToken(token)
+		if err != nil {
+			return nil, "", err
+		}
+	}
+
+	cacert, caChecksum, err := CACerts(server, token, clusterToken)
+	if err != nil {
+		return nil, "", err
+	}
+
+	if isTPM {
+		data, err := tpm.Get(cacert, u.String(), nil)
+		return data, caChecksum, err
+	}
+
 	req, err := http.NewRequest(http.MethodGet, u.String(), nil)
 	if err != nil {
 		return nil, "", err
 	}
 	if !clusterToken {
 		req.Header.Set("Authorization", "Bearer "+base64.StdEncoding.EncodeToString([]byte(token)))
-	}
-
-	cacert, caChecksum, err := CACerts(server, token, clusterToken)
-	if err != nil {
-		return nil, "", err
 	}
 
 	var resp *http.Response
@@ -103,6 +119,13 @@ func CACerts(server, token string, clusterToken bool) ([]byte, string, error) {
 	if !clusterToken {
 		requestURL = fmt.Sprintf("https://%s/v1-rancheros/cacerts", url.Host)
 	}
+
+	if resp, err := http.Get(requestURL); err == nil {
+		_, _ = ioutil.ReadAll(resp.Body)
+		resp.Body.Close()
+		return nil, "", nil
+	}
+
 	req, err := http.NewRequest(http.MethodGet, requestURL, nil)
 	if err != nil {
 		return nil, "", err
@@ -119,6 +142,10 @@ func CACerts(server, token string, clusterToken bool) ([]byte, string, error) {
 	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, "", err
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, "", fmt.Errorf("response %d: %s getting cacerts: %s", resp.StatusCode, resp.Status, data)
 	}
 
 	if resp.Header.Get("X-Cattle-Hash") != hash(token, nonce, data) {
