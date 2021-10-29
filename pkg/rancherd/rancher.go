@@ -60,7 +60,7 @@ func (r *Rancherd) Info(ctx context.Context) error {
 func (r *Rancherd) Upgrade(ctx context.Context, upgradeConfig UpgradeConfig) error {
 	cfg, err := config.Load(r.cfg.ConfigPath)
 	if err != nil {
-		return fmt.Errorf("loading config from %s: %w", r.cfg.ConfigPath, err)
+		return fmt.Errorf("loading config: %w", err)
 	}
 
 	rancherVersion, err := versions.RancherVersion(upgradeConfig.RancherVersion)
@@ -145,7 +145,7 @@ func (r *Rancherd) Upgrade(ctx context.Context, upgradeConfig UpgradeConfig) err
 func (r *Rancherd) execute(ctx context.Context) error {
 	cfg, err := config.Load(r.cfg.ConfigPath)
 	if err != nil {
-		return fmt.Errorf("loading config from %s: %w", r.cfg.ConfigPath, err)
+		return fmt.Errorf("loading config: %w", err)
 	}
 
 	if err := r.setWorking(cfg); err != nil {

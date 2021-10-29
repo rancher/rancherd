@@ -12,6 +12,7 @@ import (
 
 	"github.com/google/go-attestation/attest"
 	"github.com/gorilla/websocket"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -34,6 +35,11 @@ func Get(cacerts []byte, url string, header http.Header) ([]byte, error) {
 		return nil, err
 	}
 
+	hash, err := GetPubHash()
+	if err != nil {
+		return nil, err
+	}
+
 	token, err := getToken(attestationData)
 	if err != nil {
 		return nil, err
@@ -44,9 +50,15 @@ func Get(cacerts []byte, url string, header http.Header) ([]byte, error) {
 	}
 	header.Add("Authorization", token)
 	wsURL := strings.Replace(url, "http", "ws", 1)
-	logrus.Infof("Dialing %s with Authorization: %s", wsURL, token)
-	conn, _, err := dialer.Dial(wsURL, header)
+	logrus.Infof("Using TPMHash %s to dial %s", hash, wsURL)
+	conn, resp, err := dialer.Dial(wsURL, header)
 	if err != nil {
+		if resp != nil && resp.StatusCode == http.StatusUnauthorized {
+			data, err := ioutil.ReadAll(resp.Body)
+			if err == nil {
+				return nil, errors.New(string(data))
+			}
+		}
 		return nil, err
 	}
 	defer conn.Close()
@@ -61,7 +73,7 @@ func Get(cacerts []byte, url string, header http.Header) ([]byte, error) {
 		return nil, fmt.Errorf("unmarshaling Challenge: %w", err)
 	}
 
-	resp, err := getChallengeResponse(challenge.EC, aikBytes)
+	challengeResp, err := getChallengeResponse(challenge.EC, aikBytes)
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +84,7 @@ func Get(cacerts []byte, url string, header http.Header) ([]byte, error) {
 	}
 	defer writer.Close()
 
-	if err := json.NewEncoder(writer).Encode(resp); err != nil {
+	if err := json.NewEncoder(writer).Encode(challengeResp); err != nil {
 		return nil, fmt.Errorf("encoding ChallengeResponse: %w", err)
 	}
 

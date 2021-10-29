@@ -18,12 +18,12 @@ func processRemote(cfg Config) (Config, error) {
 	logrus.Infof("server and token set but required role is not set. Trying to bootstrapping config from machine inventory")
 	resp, _, err := cacerts.MachineGet(cfg.Server, cfg.Token, "/v1-rancheros/inventory")
 	if err != nil {
-		return cfg, fmt.Errorf("bootstrapping config from machine inventory: %w", err)
+		return cfg, fmt.Errorf("from machine inventory: %w", err)
 	}
 
 	config := map[string]interface{}{}
 	if err := json.Unmarshal(resp, &config); err != nil {
-		return cfg, fmt.Errorf("decoding inventory response: %w", err)
+		return cfg, fmt.Errorf("inventory response: %s: %w", resp, err)
 	}
 
 	currentConfig, err := convert.EncodeToMap(cfg)
