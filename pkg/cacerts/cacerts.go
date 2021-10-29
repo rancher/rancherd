@@ -99,7 +99,7 @@ func get(server, token, path string, clusterToken bool) ([]byte, string, error) 
 
 	data, err := ioutil.ReadAll(resp.Body)
 	if resp.StatusCode != http.StatusOK {
-		return nil, "", fmt.Errorf("%s: %s", resp.Status, data)
+		return nil, "", fmt.Errorf("%s: %s", data, resp.Status)
 	}
 	return data, caChecksum, err
 }
