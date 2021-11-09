@@ -141,6 +141,17 @@ func ToBootstrapFile(config *config.Config, path string) (*applyinator.File, err
 				"token": token,
 			},
 		},
+	}, v1.GenericMap{
+		Data: map[string]interface{}{
+			"apiVersion": "catalog.cattle.io/v1",
+			"kind":       "ClusterRepo",
+			"metadata": map[string]interface{}{
+				"name": "rancher-stable",
+			},
+			"spec": map[string]interface{}{
+				"url": "https://releases.rancher.com/server-charts/stable",
+			},
+		},
 	}), path)
 }
 func ToFile(resources []v1.GenericMap, path string) (*applyinator.File, error) {
