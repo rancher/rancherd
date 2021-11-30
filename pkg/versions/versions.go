@@ -92,7 +92,7 @@ func RancherVersion(rancherVersion string) (string, error) {
 		return cached, nil
 	}
 
-	versionOrURL, isURL := getVersionOrURL("https://releases.rancher.com/server-charts/%s/index.yaml", "latest", rancherVersion)
+	versionOrURL, isURL := getVersionOrURL("https://releases.rancher.com/server-charts/%s/index.yaml", "stable", rancherVersion)
 	if !isURL {
 		return versionOrURL, nil
 	}
