@@ -1,6 +1,5 @@
-name: harvester-release
+name: release
 on:
-  pull_request:
   push:
     tags:
       - "v*.*.*"
