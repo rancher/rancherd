@@ -9,8 +9,8 @@ import (
 
 	"github.com/rancher/rancherd/pkg/config"
 	"github.com/rancher/rancherd/pkg/plan"
+	"github.com/rancher/rancherd/pkg/version"
 	"github.com/rancher/rancherd/pkg/versions"
-	"github.com/rancher/system-agent/pkg/version"
 	"github.com/sirupsen/logrus"
 	"sigs.k8s.io/yaml"
 )
