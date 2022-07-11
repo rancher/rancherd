@@ -7,6 +7,8 @@ on:
 jobs:
   publish-dist:
     runs-on: ubuntu-latest
+    env:
+      DRONE_TAG: ${{github.ref_name}}
     steps:
       - uses: actions/checkout@v2
       - name: build
