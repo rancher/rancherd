@@ -31,7 +31,8 @@ var probes = map[string]prober.Probe{
 		SuccessThreshold:    1,
 		FailureThreshold:    2,
 		HTTPGetAction: prober.HTTPGetAction{
-			URL: "http://127.0.0.1:10251/healthz",
+			URL:      "https://127.0.0.1:10259/healthz",
+			Insecure: true,
 		},
 	},
 	"kube-controller-manager": {
@@ -40,7 +41,8 @@ var probes = map[string]prober.Probe{
 		SuccessThreshold:    1,
 		FailureThreshold:    2,
 		HTTPGetAction: prober.HTTPGetAction{
-			URL: "http://127.0.0.1:10252/healthz",
+			URL:      "https://127.0.0.1:10257/healthz",
+			Insecure: true,
 		},
 	},
 	"kubelet": {

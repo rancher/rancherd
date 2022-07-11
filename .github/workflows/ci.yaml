@@ -1,0 +1,14 @@
+name: ci 
+on:
+  pull_request:
+  push:
+    branches:
+      - harvester-dev
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: build
+        run: make ci
