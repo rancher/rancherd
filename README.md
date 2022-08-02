@@ -1,5 +1,11 @@
 # Rancherd
 
+> **WARNING**
+>
+> - The project intends to be used in [Harvester project](https://harvesterhci.io/) at this moment. The Harvester team does its best effort to support general uses.
+> - For ["RancherD"](https://rancher.com/docs/rancher/v2.5/en/installation/other-installation-methods/install-rancher-on-linux/rancherd-configuration/) (the tool came with Rancher 2.5) issues, please report them in the [Rancher project](https://github.com/rancher/rancher).
+
+
 Rancherd bootstraps a node with Kubernetes (k3s/rke2) and Rancher such
 that all future management of Kubernetes and Rancher can be done from
 Kubernetes. Rancherd will only run once per node. Once the system has
