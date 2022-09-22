@@ -70,11 +70,6 @@ func ToBootstrapFile(config *config.Config, path string) (*applyinator.File, err
 		}
 	}
 
-	id, err := getCattleID()
-	if err != nil {
-		return nil, err
-	}
-
 	resources := config.Resources
 	return ToFile(append(resources, v1.GenericMap{
 		Data: map[string]interface{}{
@@ -102,9 +97,6 @@ func ToBootstrapFile(config *config.Config, path string) (*applyinator.File, err
 			"metadata": map[string]interface{}{
 				"name":      "local",
 				"namespace": "fleet-local",
-				"labels": map[string]interface{}{
-					"rke.cattle.io/init-node-machine-id": id,
-				},
 			},
 			"spec": map[string]interface{}{
 				"kubernetesVersion": k8sVersion,
