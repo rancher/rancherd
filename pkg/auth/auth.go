@@ -49,7 +49,7 @@ func ResetAdmin(ctx context.Context, opts *Options) error {
 		return err
 	}
 	if err := resetAdmin(ctx, opts.Kubeconfig, opts.Password, opts.PasswordFile); err != nil {
-		return errors.Wrap(err, "cluster and rancher are not ready. Please try later.")
+		return errors.Wrap(err, "cluster and rancher are not ready. Please try later")
 	}
 	return nil
 }
@@ -144,7 +144,7 @@ func resetAdmin(ctx context.Context, kubeconfig, password, passwordFile string) 
 			for _, u := range admins.Items {
 				users = append(users, u.GetName())
 			}
-			return errors.Errorf("%v users were found with %v label. They are %v. Can only reset the default admin password when there is exactly one user with this label.",
+			return errors.Errorf("%v users were found with %v label. They are %v. Can only reset the default admin password when there is exactly one user with this label",
 				count, set, users)
 		}
 
