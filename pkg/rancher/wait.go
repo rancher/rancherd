@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/rancher/system-agent/pkg/applyinator"
+
 	"github.com/rancher/rancherd/pkg/kubectl"
 	"github.com/rancher/rancherd/pkg/self"
-	"github.com/rancher/system-agent/pkg/applyinator"
 )
 
 func ToWaitRancherInstruction(imageOverride, systemDefaultRegistry, k8sVersion string) (*applyinator.Instruction, error) {
@@ -63,5 +64,34 @@ func ToWaitSUCPlanInstruction(imageOverride, systemDefaultRegistry, k8sVersion s
 			"--for=condition=LatestResolved=true", "plans.upgrade.cattle.io", "system-agent-upgrader"},
 		Env:     kubectl.Env(k8sVersion),
 		Command: cmd,
+	}, nil
+}
+
+func ToWaitClusterClientSecretInstruction(imageOverride, systemDefaultRegistry, k8sVersion string) (*applyinator.Instruction, error) {
+	cmd, err := self.Self()
+	if err != nil {
+		return nil, fmt.Errorf("resolving location of %s: %w", os.Args[0], err)
+	}
+	return &applyinator.Instruction{
+		Name:       "wait-cluster-client-secret-resolved",
+		SaveOutput: true,
+		Args: []string{"retry", kubectl.Command(k8sVersion), "-n", clusterNamespace, "get",
+			"secret", clusterClientSecret},
+		Env:     kubectl.Env(k8sVersion),
+		Command: cmd,
+	}, nil
+}
+
+func ToUpdateClientSecretInstruction(imageOverride, systemDefaultRegistry, k8sVersion string) (*applyinator.Instruction, error) {
+	cmd, err := self.Self()
+	if err != nil {
+		return nil, fmt.Errorf("resolving location of %s: %w", os.Args[0], err)
+	}
+	return &applyinator.Instruction{
+		Name:       "update-client-secret",
+		SaveOutput: true,
+		Args:       []string{"update-client-secret"},
+		Env:        kubectl.Env(k8sVersion),
+		Command:    cmd,
 	}, nil
 }

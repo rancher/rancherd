@@ -1,6 +1,9 @@
 package main
 
 import (
+	cli "github.com/rancher/wrangler-cli"
+	"github.com/spf13/cobra"
+
 	"github.com/rancher/rancherd/cmd/rancherd/bootstrap"
 	"github.com/rancher/rancherd/cmd/rancherd/gettoken"
 	"github.com/rancher/rancherd/cmd/rancherd/gettpmhash"
@@ -8,9 +11,8 @@ import (
 	"github.com/rancher/rancherd/cmd/rancherd/probe"
 	"github.com/rancher/rancherd/cmd/rancherd/resetadmin"
 	"github.com/rancher/rancherd/cmd/rancherd/retry"
+	"github.com/rancher/rancherd/cmd/rancherd/updateclientsecret"
 	"github.com/rancher/rancherd/cmd/rancherd/upgrade"
-	cli "github.com/rancher/wrangler-cli"
-	"github.com/spf13/cobra"
 )
 
 type Rancherd struct {
@@ -33,6 +35,7 @@ func main() {
 		upgrade.NewUpgrade(),
 		info.NewInfo(),
 		gettpmhash.NewGetTPMHash(),
+		updateclientsecret.NewUpdateClientSecret(),
 	)
 	cli.Main(root)
 }

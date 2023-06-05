@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/rancher/system-agent/pkg/applyinator"
+
 	"github.com/rancher/rancherd/pkg/config"
 	"github.com/rancher/rancherd/pkg/discovery"
 	"github.com/rancher/rancherd/pkg/join"
@@ -14,7 +16,6 @@ import (
 	"github.com/rancher/rancherd/pkg/resources"
 	"github.com/rancher/rancherd/pkg/runtime"
 	"github.com/rancher/rancherd/pkg/versions"
-	"github.com/rancher/system-agent/pkg/applyinator"
 )
 
 type plan applyinator.Plan
@@ -103,6 +104,14 @@ func (p *plan) addInstructions(cfg *config.Config, dataDir string) error {
 	}
 
 	if err := p.addInstruction(rancher.ToWaitRancherWebhookInstruction(cfg.RancherInstallerImage, cfg.SystemDefaultRegistry, k8sVersion)); err != nil {
+		return err
+	}
+
+	if err := p.addInstruction(rancher.ToWaitClusterClientSecretInstruction(cfg.RancherInstallerImage, cfg.SystemDefaultRegistry, k8sVersion)); err != nil {
+		return err
+	}
+
+	if err := p.addInstruction(rancher.ToUpdateClientSecretInstruction(cfg.RancherInstallerImage, cfg.SystemDefaultRegistry, k8sVersion)); err != nil {
 		return err
 	}
 
