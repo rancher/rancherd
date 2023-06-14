@@ -111,7 +111,15 @@ func (p *plan) addInstructions(cfg *config.Config, dataDir string) error {
 		return err
 	}
 
+	if err := p.addInstruction(rancher.ToScaleDownFleetControllerInstruction(cfg.RancherInstallerImage, cfg.SystemDefaultRegistry, k8sVersion)); err != nil {
+		return err
+	}
+
 	if err := p.addInstruction(rancher.ToUpdateClientSecretInstruction(cfg.RancherInstallerImage, cfg.SystemDefaultRegistry, k8sVersion)); err != nil {
+		return err
+	}
+
+	if err := p.addInstruction(rancher.ToScaleUpFleetControllerInstruction(cfg.RancherInstallerImage, cfg.SystemDefaultRegistry, k8sVersion)); err != nil {
 		return err
 	}
 
