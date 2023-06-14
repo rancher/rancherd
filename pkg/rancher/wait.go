@@ -95,3 +95,31 @@ func ToUpdateClientSecretInstruction(imageOverride, systemDefaultRegistry, k8sVe
 		Command:    cmd,
 	}, nil
 }
+
+func ToScaleDownFleetControllerInstruction(imageOverride, systemDefaultRegistry, k8sVersion string) (*applyinator.Instruction, error) {
+	cmd, err := self.Self()
+	if err != nil {
+		return nil, fmt.Errorf("resolving location of %s: %w", os.Args[0], err)
+	}
+	return &applyinator.Instruction{
+		Name:       "scale-down-fleet-controller",
+		SaveOutput: true,
+		Args:       []string{"retry", kubectl.Command(k8sVersion), "-n", "cattle-fleet-system", "scale", "--replicas", "0", "deploy/fleet-controller"},
+		Env:        kubectl.Env(k8sVersion),
+		Command:    cmd,
+	}, nil
+}
+
+func ToScaleUpFleetControllerInstruction(imageOverride, systemDefaultRegistry, k8sVersion string) (*applyinator.Instruction, error) {
+	cmd, err := self.Self()
+	if err != nil {
+		return nil, fmt.Errorf("resolving location of %s: %w", os.Args[0], err)
+	}
+	return &applyinator.Instruction{
+		Name:       "scale-up-fleet-controller",
+		SaveOutput: true,
+		Args:       []string{"retry", kubectl.Command(k8sVersion), "-n", "cattle-fleet-system", "scale", "--replicas", "1", "deploy/fleet-controller"},
+		Env:        kubectl.Env(k8sVersion),
+		Command:    cmd,
+	}, nil
+}
