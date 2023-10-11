@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/rancher/rancherd/pkg/tpm"
+	"github.com/rancher/system-agent/pkg/applyinator"
 	"github.com/rancher/wrangler/pkg/randomtoken"
 )
 
@@ -159,6 +160,29 @@ func CACerts(server, token string, clusterToken bool) ([]byte, string, error) {
 	}
 
 	return data, hashHex(data), nil
+}
+
+func ToUpdateCACertificatesInstruction() (*applyinator.Instruction, error) {
+	cmd := "update-ca-certificates"
+
+	return &applyinator.Instruction{
+		Name:       "update-ca-certificates",
+		SaveOutput: true,
+		Command:    cmd,
+	}, nil
+}
+
+func ToFile(server, token string) (*applyinator.File, error) {
+	cacert, _, err := CACerts(server, token, true)
+	if err != nil {
+		return nil, err
+	}
+
+	return &applyinator.File{
+		Content:     base64.StdEncoding.EncodeToString(cacert),
+		Path:        "/etc/pki/trust/anchors/additional-ca.pem",
+		Permissions: "0644",
+	}, nil
 }
 
 func hashHex(token []byte) string {

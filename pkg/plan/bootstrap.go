@@ -6,6 +6,7 @@ import (
 
 	"github.com/rancher/system-agent/pkg/applyinator"
 
+	"github.com/rancher/rancherd/pkg/cacerts"
 	"github.com/rancher/rancherd/pkg/config"
 	"github.com/rancher/rancherd/pkg/discovery"
 	"github.com/rancher/rancherd/pkg/join"
@@ -50,7 +51,13 @@ func toJoinPlan(cfg *config.Config, dataDir string) (*applyinator.Plan, error) {
 	}
 
 	plan := plan{}
+	if err := plan.addFile(cacerts.ToFile(cfg.Server, cfg.Token)); err != nil {
+		return nil, err
+	}
 	if err := plan.addFile(join.ToScriptFile(cfg, dataDir)); err != nil {
+		return nil, err
+	}
+	if err := plan.addInstruction(cacerts.ToUpdateCACertificatesInstruction()); err != nil {
 		return nil, err
 	}
 	if err := plan.addInstruction(join.ToInstruction(cfg, dataDir)); err != nil {
@@ -202,6 +209,7 @@ func (p *plan) addFiles(cfg *config.Config, dataDir string) error {
 
 	// rancher values.yaml
 	return p.addFile(rancher.ToFile(cfg, dataDir))
+
 }
 
 func (p *plan) addFile(file *applyinator.File, err error) error {
