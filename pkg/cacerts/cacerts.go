@@ -180,7 +180,7 @@ func ToFile(server, token string) (*applyinator.File, error) {
 
 	return &applyinator.File{
 		Content:     base64.StdEncoding.EncodeToString(cacert),
-		Path:        "/etc/pki/trust/anchors/additional-ca.pem",
+		Path:        "/etc/pki/trust/anchors/embedded-rancher-ca.pem",
 		Permissions: "0644",
 	}, nil
 }
