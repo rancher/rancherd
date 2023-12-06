@@ -44,7 +44,7 @@ func ToWaitSUCInstruction(imageOverride, systemDefaultRegistry, k8sVersion strin
 		return nil, fmt.Errorf("resolving location of %s: %w", os.Args[0], err)
 	}
 	return &applyinator.Instruction{
-		Name:       "wait-rancher-webhook",
+		Name:       "wait-system-upgrade-controller",
 		SaveOutput: true,
 		Args:       []string{"retry", kubectl.Command(k8sVersion), "-n", "cattle-system", "rollout", "status", "-w", "deploy/system-upgrade-controller"},
 		Env:        kubectl.Env(k8sVersion),
