@@ -102,6 +102,9 @@ func ToBootstrapFile(config *config.Config, path string) (*applyinator.File, err
 			"metadata": map[string]interface{}{
 				"name":      "local",
 				"namespace": "fleet-local",
+				"labels": map[string]interface{}{
+					"provisioning.cattle.io/management-cluster-name": "local",
+				},
 			},
 			"spec": map[string]interface{}{
 				"kubernetesVersion": k8sVersion,

@@ -123,3 +123,19 @@ func ToScaleUpFleetControllerInstruction(imageOverride, systemDefaultRegistry, k
 		Command:    cmd,
 	}, nil
 }
+
+// Needs to patch status subresource
+// k patch cluster.provisioning local -n fleet-local --subresource=status --type=merge --patch '{"status":{"fleetWorkspaceName": "fleet-local"}}'
+func PatchLocalProvisioningClusterStatus(imageOverride, systemDefaultRegistry, k8sVersion string) (*applyinator.Instruction, error) {
+	cmd, err := self.Self()
+	if err != nil {
+		return nil, fmt.Errorf("resolving location of %s: %w", os.Args[0], err)
+	}
+	return &applyinator.Instruction{
+		Name:       "wait-suc-plan-resolved",
+		SaveOutput: true,
+		Args:       []string{"retry", kubectl.Command(k8sVersion), "-n", "fleet-local", "patch", "cluster.provisioning", "local", "--subresource=status", "--type=merge", "--patch", "{\"status\":{\"fleetWorkspaceName\": \"fleet-local\"}}"},
+		Env:        kubectl.Env(k8sVersion),
+		Command:    cmd,
+	}, nil
+}
