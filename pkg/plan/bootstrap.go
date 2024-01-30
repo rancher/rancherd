@@ -3,6 +3,7 @@ package plan
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/rancher/system-agent/pkg/applyinator"
 
@@ -132,6 +133,13 @@ func (p *plan) addInstructions(cfg *config.Config, dataDir string) error {
 
 	if err := p.addInstruction(resources.ToInstruction(cfg.RancherInstallerImage, cfg.SystemDefaultRegistry, k8sVersion, dataDir)); err != nil {
 		return err
+	}
+
+	// currently instruction is only needed for v2.8.x
+	if strings.HasPrefix(cfg.RancherVersion, "v2.8") {
+		if err := p.addInstruction(rancher.PatchLocalProvisioningClusterStatus(cfg.RancherInstallerImage, cfg.SystemDefaultRegistry, k8sVersion)); err != nil {
+			return err
+		}
 	}
 
 	if err := p.addInstruction(rancher.ToWaitSUCInstruction(cfg.RancherInstallerImage, cfg.SystemDefaultRegistry, k8sVersion)); err != nil {
