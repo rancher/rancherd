@@ -1,6 +1,6 @@
 module github.com/harvester/rancherd
 
-go 1.26
+go 1.26.0
 
 replace (
 	k8s.io/api => k8s.io/api v0.34.5
@@ -48,7 +48,7 @@ require (
 	github.com/rancher/wrangler/v3 v3.3.4
 	github.com/sirupsen/logrus v1.9.4
 	github.com/spf13/cobra v1.9.1
-	golang.org/x/crypto v0.55.0
+	golang.org/x/crypto v0.56.0
 	golang.org/x/mod v0.40.0
 	gopkg.in/yaml.v2 v2.4.0
 	gopkg.in/yaml.v3 v3.0.1
