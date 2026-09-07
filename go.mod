@@ -38,7 +38,7 @@ replace (
 
 require (
 	github.com/google/certificate-transparency-go v1.1.2
-	github.com/google/go-attestation v0.5.1
+	github.com/google/go-attestation v0.6.1
 	github.com/gorilla/websocket v1.5.4-0.20250319132907-e064f32e3674
 	github.com/hashicorp/go-discover v0.0.0-20201029210230-738cb3105cd0
 	github.com/pkg/errors v0.9.1
@@ -112,8 +112,7 @@ require (
 	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/google/go-containerregistry v0.20.2 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
-	github.com/google/go-tpm v0.9.0 // indirect
-	github.com/google/go-tspi v0.3.0 // indirect
+	github.com/google/go-tpm v0.9.8 // indirect
 	github.com/google/s2a-go v0.1.9 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.11 // indirect
