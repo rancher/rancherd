@@ -109,9 +109,7 @@ func Get(cacerts []byte, url string, header http.Header) ([]byte, error) {
 }
 
 func getChallengeResponse(ec *attest.EncryptedCredential, aikBytes []byte) (*ChallengeResponse, error) {
-	tpm, err := attest.OpenTPM(&attest.OpenConfig{
-		TPMVersion: attest.TPMVersion20,
-	})
+	tpm, err := attest.OpenTPM(&attest.OpenConfig{})
 	if err != nil {
 		return nil, fmt.Errorf("opening tpm: %w", err)
 	}

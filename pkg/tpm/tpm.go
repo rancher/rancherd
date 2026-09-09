@@ -35,9 +35,7 @@ func GetPubHash() (string, error) {
 
 func getEK() (*attest.EK, error) {
 	var err error
-	tpm, err := attest.OpenTPM(&attest.OpenConfig{
-		TPMVersion: attest.TPMVersion20,
-	})
+	tpm, err := attest.OpenTPM(&attest.OpenConfig{})
 	if err != nil {
 		return nil, fmt.Errorf("opening tpm: %w", err)
 	}
@@ -70,9 +68,7 @@ func getToken(data *AttestationData) (string, error) {
 
 func getAttestationData() (*AttestationData, []byte, error) {
 	var err error
-	tpm, err := attest.OpenTPM(&attest.OpenConfig{
-		TPMVersion: attest.TPMVersion20,
-	})
+	tpm, err := attest.OpenTPM(&attest.OpenConfig{})
 	if err != nil {
 		return nil, nil, fmt.Errorf("opening tpm: %w", err)
 	}
